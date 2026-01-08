@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BrickVision - Unlock Your Imagination</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              legoYellow: '#FFD500',
+              legoRed: '#C91A09',
+              legoBlue: '#0055BF',
+              legoGray: '#F2F2F2',
+            },
+            fontFamily: {
+              heading: ['"Fredoka One"', 'cursive'],
+              body: ['"Open Sans"', 'sans-serif'],
+            },
+            boxShadow: {
+              'lego': '0 8px 0 #9B1307',
+              'lego-yellow': '0 8px 0 #C4A400',
+              'lego-blue': '0 8px 0 #003F8F',
+              'lego-pressed': '0 2px 0 #9B1307',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Open Sans', sans-serif;
+      }
+      .stud-pattern {
+        background-color: #FFD500;
+        background-image: radial-gradient(rgba(0,0,0,0.08) 25%, transparent 25%);
+        background-size: 40px 40px;
+      }
+      .stud-pattern-light {
+        background-image: radial-gradient(rgba(0,0,0,0.03) 20%, transparent 20%);
+        background-size: 30px 30px;
+      }
+      
+      /* PRECISION SCANNING ANIMATIONS */
+
+      @keyframes scanner-beam {
+        0%, 10% { left: 0%; opacity: 0; }
+        15% { opacity: 1; }
+        85% { opacity: 1; }
+        90%, 100% { left: 100%; opacity: 0; }
+      }
+
+      /* Reveal structure on the LEFT of the beam as it moves right */
+      @keyframes reveal-build {
+        0%, 10% { clip-path: inset(0 100% 0 0); opacity: 0; }
+        11% { opacity: 1; }
+        90%, 100% { clip-path: inset(0 0 0 0); opacity: 1; }
+      }
+
+      /* Hide pile on the LEFT of the beam (leaving only right side visible ahead of line) */
+      @keyframes hide-pile {
+        0%, 10% { clip-path: inset(0 0 0 0); opacity: 1; }
+        90%, 100% { clip-path: inset(0 0 0 100%); opacity: 0; }
+      }
+
+      /* 18s Figure Cycle: Each figure gets 6s (matching one scan sweep) */
+      @keyframes figure-duck {
+        0%, 33.32% { opacity: 1; transform: scale(1); }
+        33.33%, 100% { opacity: 0; transform: scale(0.95); }
+      }
+
+      @keyframes figure-robot {
+        0%, 33.32% { opacity: 0; transform: scale(0.95); }
+        33.33%, 66.65% { opacity: 1; transform: scale(1); }
+        66.66%, 100% { opacity: 0; transform: scale(0.95); }
+      }
+
+      @keyframes figure-car {
+        0%, 66.65% { opacity: 0; transform: scale(0.95); }
+        66.66%, 99.99% { opacity: 1; transform: scale(1); }
+        100% { opacity: 0; }
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(-1deg); }
+        50% { transform: translateY(-20px) rotate(1deg); }
+      }
+
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-white text-gray-900 antialiased selection:bg-legoBlue selection:text-white">
+    <div id="root"></div>
+  </body>
+</html>
