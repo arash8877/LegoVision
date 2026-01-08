@@ -12,17 +12,21 @@ import { VisionAnalysis } from "../types";
 export async function analyzeBrickPile(base64Image: string): Promise<VisionAnalysis> {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  const prompt = `Analyze this photo of LEGO bricks. 
+  const prompt = `Analyze this photo of LEGO bricks with 100% precision. 
   
-  TASK 1: Create a precise inventory of all visible bricks. Note their exact size (e.g., 2x4, 1x2, 1x1), shape (brick, plate, slope), and color.
-  TASK 2: Suggest exactly 3 creative "micro-build" ideas.
+  STEP 1: Create an exact count and inventory of every brick visible. 
+  - Note dimensions exactly (e.g., "1x4" is different from "2x4").
+  - Note quantity exactly (e.g., if there is only one "1x1 Red Brick", you cannot use two).
+  - Note colors exactly.
+
+  STEP 2: Suggest 3 creative "micro-build" ideas.
   
-  STRICT CONSTRAINTS FOR SUGGESTIONS:
-  1. INVENTORY ONLY: Each suggested build MUST use ONLY the exact bricks found in the photo. 
-  2. NO INVENTING: Do not suggest pieces that aren't clearly visible (e.g., don't use a 2x4 green brick if the photo only has a 1x4 green brick).
-  3. NO SUBSTITUTIONS: Do not use different colors or sizes than those identified.
-  4. SUBSET RULE: Each build should be a strict subset of the total pile.
-  
+  CRITICAL CONSTRAINTS FOR BUILD SUGGESTIONS:
+  1. PHYSICAL POSSIBILITY: A human must be able to build this using ONLY the pieces in the photo.
+  2. STRICT BRICK COUNT: If the photo has one Green 1x4, the build MUST NOT use more than one Green 1x4. It cannot use a Green 2x4 if one isn't there.
+  3. NO SUBSTITUTIONS: Do not invent, hallucinate, or substitute any bricks.
+  4. NO PIECE DUPLICATION: You cannot use the same physical brick for two different parts of the same build.
+
   Return the result in valid JSON format matching the schema provided.`;
 
   const result = await ai.models.generateContent({
@@ -41,7 +45,7 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
           identifiedBricks: {
             type: Type.ARRAY,
             items: { type: Type.STRING },
-            description: "List of all unique bricks identified in the photo (e.g. 'Red 2x4 Brick', 'Blue 2x2 Plate')"
+            description: "Detailed list of all bricks identified (e.g. '1x Red 2x4 Brick', '2x Blue 1x2 Plate')"
           },
           colorPalette: {
             type: Type.ARRAY,
@@ -63,7 +67,7 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
                 requiredBricks: {
                   type: Type.ARRAY,
                   items: { type: Type.STRING },
-                  description: "The specific subset of identified bricks used in this build."
+                  description: "The specific subset of identified bricks used, including their exact quantities."
                 },
                 steps: {
                   type: Type.ARRAY,
@@ -96,21 +100,21 @@ export async function generateBuildImage(
 ): Promise<string> {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  // Refined prompt to strictly use the identified brick list
-  const prompt = `Generate a stylized, high-quality cartoon-style illustration of a completed LEGO micro-build called "${title}". 
+  const prompt = `Generate a stylized cartoon illustration of a completed LEGO micro-build called "${title}". 
   
-  CONSTRUCTION CONSTRAINT:
-  The build must be illustrated using ONLY this exact list of bricks: ${requiredBricks.join(', ')}.
-  DO NOT add any extra pieces. DO NOT use different colors or sizes. The illustration must be a physically accurate representation of a build using ONLY those pieces.
-  
-  STYLE REQUIREMENTS:
-  1. CARTOON ILLUSTRATION: Clean 2.5D perspective, bold black outlines (line-art style).
-  2. FLAT COLORS: Playful, vibrant LEGO colors matching the provided list.
-  3. GEOMETRY: Smooth rounded corners and simplified brick shapes.
-  4. STUDS: Simple cylindrical studs with a small highlight on the top left.
-  5. ENVIRONMENT: Isolated on a clean, solid white background.
-  
-  The final result must look like a professional modern UI illustration.`;
+  STRICT BRICK ADHERENCE:
+  Use ONLY these bricks: ${requiredBricks.join(', ')}. 
+  - Do not use more bricks than listed. 
+  - Match dimensions perfectly (e.g., if a 1x4 is listed, use a 1x4, NOT a 2x4).
+
+  VISUAL CONSISTENCY RULES:
+  1. UNIFORM COLOR: Each brick must have a single, consistent base color. The sides of the brick must be the same color as the top (only slightly darker for shading).
+  2. MATCHING STUDS: The circular studs on top of each brick MUST be the exact same color as the brick's body.
+  3. CARTOON STYLE: 2.5D perspective, thick black outlines, flat colors.
+  4. NO TEXTURES: No plastic grain, no logos, no stickers. Just clean, stylized shapes.
+  5. BACKGROUND: Solid, clean white background only.
+
+  The final result must look like a professional, clean UI illustration with perfectly consistent colors for each piece.`;
 
   const result = await ai.models.generateContent({
     model: 'gemini-2.5-flash-image',

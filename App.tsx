@@ -10,23 +10,19 @@ type ViewState = 'landing' | 'results';
 
 /**
  * Cartoon-Style LEGO Brick Component (SVG Implementation)
- * Redesigned to match the reference illustration style:
- * - Highly rounded corners (rx=10)
- * - Distinct 2.5D perspective with separate top and side faces
- * - Flat vibrant colors with clean shading
- * - Stylized cylindrical studs with crescent highlights
- * - Consistent soft dark outlines
+ * Enforces uniform color rules:
+ * - Sides use the same base color with a simple opacity overlay for shading.
+ * - Studs match the body color perfectly.
  */
 const RealisticBrick: React.FC<{ 
   x: number, y: number, w: number, h: number, color: string, studs?: number, rotate?: number, className?: string, opacity?: string 
 }> = ({ x, y, w, h, color, studs = 0, rotate = 0, className = "", opacity = "1" }) => {
   const cornerRadius = 10;
-  const faceDepth = 12; // Height of the side face
-  const studTopHeight = 6; // Lift for the top of the stud
-  const outlineColor = "rgba(0,0,0,0.15)";
+  const faceDepth = 12; 
+  const studTopHeight = 6; 
+  const outlineColor = "rgba(0,0,0,0.2)";
   const outlineWidth = 1.5;
   
-  // Logical layout for studs
   const studRows = studs > 4 ? 2 : 1;
   const studsPerRow = Math.ceil(studs / studRows);
   const studSpacingX = w / (studsPerRow + 1);
@@ -35,10 +31,10 @@ const RealisticBrick: React.FC<{
 
   return (
     <g transform={`rotate(${rotate} ${x + w/2} ${y + h/2})`} className={`${className} select-none`} opacity={opacity}>
-      {/* 1. Ground Shadow (Very soft) */}
+      {/* 1. Ground Shadow */}
       <rect x={x + 4} y={y + faceDepth + 4} width={w} height={h} rx={cornerRadius} fill="black" opacity="0.05" />
 
-      {/* 2. Side Face (The depth of the brick) */}
+      {/* 2. Side Face (Ensuring uniform color with subtle darkening) */}
       <rect 
         x={x} 
         y={y + (faceDepth / 2)} 
@@ -47,7 +43,6 @@ const RealisticBrick: React.FC<{
         rx={cornerRadius} 
         fill={color} 
       />
-      {/* Side Shading (Darker) */}
       <rect 
         x={x} 
         y={y + (faceDepth / 2)} 
@@ -55,9 +50,8 @@ const RealisticBrick: React.FC<{
         height={h + (faceDepth / 2)} 
         rx={cornerRadius} 
         fill="black" 
-        opacity="0.18" 
+        opacity="0.15" 
       />
-      {/* Side Outline */}
       <rect 
         x={x} 
         y={y + (faceDepth / 2)} 
@@ -69,7 +63,7 @@ const RealisticBrick: React.FC<{
         strokeWidth={outlineWidth} 
       />
 
-      {/* 3. Top Face */}
+      {/* 3. Top Face (Main color) */}
       <rect 
         x={x} 
         y={y} 
@@ -78,17 +72,6 @@ const RealisticBrick: React.FC<{
         rx={cornerRadius} 
         fill={color} 
       />
-      {/* Top Highlight Rim */}
-      <rect 
-        x={x + 1} 
-        y={y + 1} 
-        width={w - 2} 
-        height={h - 2} 
-        rx={cornerRadius - 1} 
-        fill="white" 
-        opacity="0.12" 
-      />
-      {/* Top Outline */}
       <rect 
         x={x} 
         y={y} 
@@ -100,7 +83,7 @@ const RealisticBrick: React.FC<{
         strokeWidth={outlineWidth} 
       />
 
-      {/* 4. Stylized Studs */}
+      {/* 4. Studs (Matching Body Color) */}
       {Array.from({ length: studs }).map((_, i) => {
         const row = Math.floor(i / studsPerRow);
         const col = i % studsPerRow;
@@ -109,21 +92,18 @@ const RealisticBrick: React.FC<{
 
         return (
           <g key={i}>
-            {/* Stud Side (Cylinder body) */}
+            {/* Stud Side */}
             <circle cx={cx} cy={cy} r={studRadius} fill={color} />
-            <circle cx={cx} cy={cy} r={studRadius} fill="black" opacity="0.15" />
+            <circle cx={cx} cy={cy} r={studRadius} fill="black" opacity="0.1" />
             <circle cx={cx} cy={cy} r={studRadius} fill="none" stroke={outlineColor} strokeWidth={outlineWidth} />
             
-            {/* Stud Top Face */}
+            {/* Stud Top - Same Color */}
             <circle cx={cx} cy={cy - studTopHeight} r={studRadius} fill={color} />
             
-            {/* Stud Top Shine (Inner Highlight) */}
-            <circle cx={cx} cy={cy - studTopHeight} r={studRadius * 0.8} fill="white" opacity="0.08" />
+            {/* Stud Highlight (Stylized) */}
+            <circle cx={cx - (studRadius * 0.3)} cy={cy - studTopHeight - (studRadius * 0.3)} r={studRadius * 0.25} fill="white" opacity="0.3" />
             
-            {/* Stud Crescent Highlight (Stylized) */}
-            <circle cx={cx - (studRadius * 0.3)} cy={cy - studTopHeight - (studRadius * 0.3)} r={studRadius * 0.3} fill="white" opacity="0.4" />
-            
-            {/* Stud Top Outline */}
+            {/* Stud Outline */}
             <circle cx={cx} cy={cy - studTopHeight} r={studRadius} fill="none" stroke={outlineColor} strokeWidth={outlineWidth} />
           </g>
         );
@@ -135,15 +115,11 @@ const RealisticBrick: React.FC<{
 const JourneyAnimation: React.FC = () => {
   return (
     <div className="relative w-full aspect-square bg-slate-50 rounded-[3rem] md:rounded-[5rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.3)] overflow-hidden border-[16px] md:border-[24px] border-legoBlue flex items-center justify-center">
-      {/* Background with soft lighting */}
       <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-100 to-gray-200"></div>
       <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
-
-      {/* High-Tech Single Scanning Line */}
       <div className="absolute inset-y-0 w-[4px] bg-white z-50 animate-[scanner-beam_6s_infinite] shadow-[0_0_20px_white,0_0_10px_rgba(0,85,191,0.6)]"></div>
 
       <div className="relative w-full h-full p-8 md:p-12">
-        {/* PILE LAYER (Right of beam) */}
         <div className="absolute inset-0 z-10 animate-[hide-pile_6s_infinite]">
           <svg viewBox="0 0 400 400" className="w-full h-full">
             <RealisticBrick x={100} y={280} w={65} h={40} color="#0055BF" studs={8} rotate={15} />
@@ -155,10 +131,8 @@ const JourneyAnimation: React.FC = () => {
           </svg>
         </div>
 
-        {/* BUILD LAYER (Left of beam) */}
         <div className="absolute inset-0 z-20 animate-[reveal-build_6s_infinite]">
           <svg viewBox="0 0 400 400" className="w-full h-full">
-            {/* Figure 1: Duck */}
             <g className="animate-[figure-duck_18s_infinite]">
               <RealisticBrick x={150} y={280} w={45} h={25} color="#C91A09" studs={2} />
               <RealisticBrick x={215} y={280} w={45} h={25} color="#C91A09" studs={2} />
@@ -168,8 +142,6 @@ const JourneyAnimation: React.FC = () => {
               <RealisticBrick x={215} y={65} w={75} h={45} color="#FFD500" studs={4} />
               <circle cx={255} cy={85} r="6" fill="black" opacity="0.6" />
             </g>
-
-            {/* Figure 2: Robot */}
             <g className="animate-[figure-robot_18s_infinite] opacity-0">
                <RealisticBrick x={175} y={280} w={50} h={75} color="#C91A09" studs={4} />
                <RealisticBrick x={235} y={280} w={50} h={75} color="#C91A09" studs={4} />
@@ -178,8 +150,6 @@ const JourneyAnimation: React.FC = () => {
                <circle cx={225} cy={145} r="4" fill="black" opacity="0.5" />
                <circle cx={245} cy={145} r="4" fill="black" opacity="0.5" />
             </g>
-
-            {/* Figure 3: Race Car */}
             <g className="animate-[figure-car_18s_infinite] opacity-0">
                <RealisticBrick x={130} y={260} w={200} h={40} color="#C91A09" studs={12} />
                <circle cx={170} cy={305} r="22" fill="#222" />
@@ -253,7 +223,7 @@ const App: React.FC = () => {
       {isLoading ? (
         <div className="flex-1 flex flex-col items-center justify-center p-12 bg-white">
           <div className="w-32 h-32 bg-legoYellow rounded-[2rem] border-8 border-legoBlue shadow-lego animate-bounce flex items-center justify-center text-6xl">🧩</div>
-          <h2 className="mt-12 font-heading text-5xl text-legoBlue animate-pulse text-center">Identifying Geometry...</h2>
+          <h2 className="mt-12 font-heading text-5xl text-legoBlue animate-pulse text-center">Precise Piece Inventory...</h2>
         </div>
       ) : (
         view === 'landing' ? (
