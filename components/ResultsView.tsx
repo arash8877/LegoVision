@@ -68,7 +68,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
             <div className="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
               <div>
                 <h2 className="font-heading text-3xl md:text-4xl text-legoBlue mb-2">3 New Possibilities</h2>
-                <p className="text-gray-600 font-semibold italic">Customized to your colors and brick shapes.</p>
+                <p className="text-gray-600 font-semibold italic">Customized to your exact pieces and colors.</p>
               </div>
               <BrickButton 
                 variant="red" 
@@ -106,7 +106,8 @@ const BuildCard: React.FC<{ build: MicroBuild; sourceImage: string }> = ({ build
         setIsGeneratingImage(true);
         try {
           const base64 = sourceImage.split(',')[1];
-          const imgUrl = await generateBuildImage(base64, build.title, build.steps, build.estimatedPieces);
+          // Pass the specific requiredBricks for high visual fidelity to the photo
+          const imgUrl = await generateBuildImage(base64, build.title, build.requiredBricks);
           setBuildImage(imgUrl);
         } catch (error) {
           console.error("Failed to generate build image", error);
@@ -117,7 +118,7 @@ const BuildCard: React.FC<{ build: MicroBuild; sourceImage: string }> = ({ build
       };
       fetchImage();
     }
-  }, [showDetails, buildImage, isGeneratingImage, build.title, build.estimatedPieces, build.steps, sourceImage]);
+  }, [showDetails, buildImage, isGeneratingImage, build.title, build.requiredBricks, sourceImage]);
 
   return (
     <div className={`

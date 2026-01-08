@@ -13,13 +13,15 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const prompt = `Analyze this photo of LEGO bricks. 
-  1. Identify the key types of bricks visible (plates, bricks, slopes, etc.).
-  2. Determine the dominant colors.
-  3. Suggest exactly 3 creative "micro-build" ideas that could be made with a subset of these bricks.
   
-  DIFFICULTY RULES:
-  - If the pile is large (>30 bricks), include 1 Easy, 1 Medium, and 1 Hard build.
-  - If the pile is small (<30 bricks), provide only Easy and Medium builds.
+  TASK 1: Create a precise inventory of all visible bricks. Note their exact size (e.g., 2x4, 1x2, 1x1), shape (brick, plate, slope), and color.
+  TASK 2: Suggest exactly 3 creative "micro-build" ideas.
+  
+  STRICT CONSTRAINTS FOR SUGGESTIONS:
+  1. INVENTORY ONLY: Each suggested build MUST use ONLY the exact bricks found in the photo. 
+  2. NO INVENTING: Do not suggest pieces that aren't clearly visible (e.g., don't use a 2x4 green brick if the photo only has a 1x4 green brick).
+  3. NO SUBSTITUTIONS: Do not use different colors or sizes than those identified.
+  4. SUBSET RULE: Each build should be a strict subset of the total pile.
   
   Return the result in valid JSON format matching the schema provided.`;
 
@@ -38,7 +40,8 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
         properties: {
           identifiedBricks: {
             type: Type.ARRAY,
-            items: { type: Type.STRING }
+            items: { type: Type.STRING },
+            description: "List of all unique bricks identified in the photo (e.g. 'Red 2x4 Brick', 'Blue 2x2 Plate')"
           },
           colorPalette: {
             type: Type.ARRAY,
@@ -57,12 +60,17 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
                   description: "Must be 'Easy', 'Medium', or 'Hard'"
                 },
                 estimatedPieces: { type: Type.NUMBER },
+                requiredBricks: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING },
+                  description: "The specific subset of identified bricks used in this build."
+                },
                 steps: {
                   type: Type.ARRAY,
                   items: { type: Type.STRING }
                 }
               },
-              required: ["title", "icon", "description", "difficulty", "estimatedPieces", "steps"]
+              required: ["title", "icon", "description", "difficulty", "estimatedPieces", "requiredBricks", "steps"]
             }
           }
         },
@@ -84,22 +92,24 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
 export async function generateBuildImage(
   sourceImageBase64: string,
   title: string,
-  steps: string[],
-  estimatedPieces: number
+  requiredBricks: string[]
 ): Promise<string> {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  // Updated prompt to strictly request the stylized cartoon UI aesthetic
-  const prompt = `Generate a stylized, high-quality cartoon-style illustration of a completed LEGO micro-build of a "${title}". 
+  // Refined prompt to strictly use the identified brick list
+  const prompt = `Generate a stylized, high-quality cartoon-style illustration of a completed LEGO micro-build called "${title}". 
   
-  STYLE REQUIREMENTS (MATCH EXACTLY):
+  CONSTRUCTION CONSTRAINT:
+  The build must be illustrated using ONLY this exact list of bricks: ${requiredBricks.join(', ')}.
+  DO NOT add any extra pieces. DO NOT use different colors or sizes. The illustration must be a physically accurate representation of a build using ONLY those pieces.
+  
+  STYLE REQUIREMENTS:
   1. CARTOON ILLUSTRATION: Clean 2.5D perspective, bold black outlines (line-art style).
-  2. FLAT COLORS: Playful, vibrant LEGO colors with very subtle shading.
+  2. FLAT COLORS: Playful, vibrant LEGO colors matching the provided list.
   3. GEOMETRY: Smooth rounded corners and simplified brick shapes.
   4. STUDS: Simple cylindrical studs with a small highlight on the top left.
-  5. ENVIRONMENT: Isolated on a clean, solid white background. No background clutter.
+  5. ENVIRONMENT: Isolated on a clean, solid white background.
   
-  DO NOT generate a photograph. DO NOT use realistic textures or plastic noise. 
   The final result must look like a professional modern UI illustration.`;
 
   const result = await ai.models.generateContent({

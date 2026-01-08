@@ -5,6 +5,7 @@ export interface MicroBuild {
   description: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   estimatedPieces: number;
+  requiredBricks: string[];
   steps: string[];
 }
 
