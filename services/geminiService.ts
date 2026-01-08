@@ -10,7 +10,6 @@ import { VisionAnalysis } from "../types";
  */
 
 export async function analyzeBrickPile(base64Image: string): Promise<VisionAnalysis> {
-  // Use process.env.API_KEY directly in the constructor per guidelines
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const prompt = `Analyze this photo of LEGO bricks. 
@@ -24,7 +23,6 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
   
   Return the result in valid JSON format matching the schema provided.`;
 
-  // Define model name directly within the generateContent parameters
   const result = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: {
@@ -89,18 +87,21 @@ export async function generateBuildImage(
   steps: string[],
   estimatedPieces: number
 ): Promise<string> {
-  // Use process.env.API_KEY directly in the constructor per guidelines
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  const prompt = `Based on the bricks in the provided photo, generate a high-quality, professional photograph of a completed LEGO micro-build of a "${title}". 
+  // Updated prompt to strictly request the stylized cartoon UI aesthetic
+  const prompt = `Generate a stylized, high-quality cartoon-style illustration of a completed LEGO micro-build of a "${title}". 
   
-  The build should:
-  1. Use only colors and basic shapes seen in the pile.
-  2. Be at a "micro-scale" using approximately ${estimatedPieces} pieces.
-  3. Look like an official LEGO "Creator" set box art or instruction final photo.
-  4. Shot in a clean, brightly lit studio environment.`;
+  STYLE REQUIREMENTS (MATCH EXACTLY):
+  1. CARTOON ILLUSTRATION: Clean 2.5D perspective, bold black outlines (line-art style).
+  2. FLAT COLORS: Playful, vibrant LEGO colors with very subtle shading.
+  3. GEOMETRY: Smooth rounded corners and simplified brick shapes.
+  4. STUDS: Simple cylindrical studs with a small highlight on the top left.
+  5. ENVIRONMENT: Isolated on a clean, solid white background. No background clutter.
+  
+  DO NOT generate a photograph. DO NOT use realistic textures or plastic noise. 
+  The final result must look like a professional modern UI illustration.`;
 
-  // Define model name directly within the generateContent parameters
   const result = await ai.models.generateContent({
     model: 'gemini-2.5-flash-image',
     contents: {
@@ -109,6 +110,11 @@ export async function generateBuildImage(
         { text: prompt }
       ]
     },
+    config: {
+      imageConfig: {
+        aspectRatio: "1:1"
+      }
+    }
   });
 
   const part = result.candidates?.[0]?.content?.parts.find(p => p.inlineData);

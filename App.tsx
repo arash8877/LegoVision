@@ -10,11 +10,10 @@ type ViewState = 'landing' | 'results';
 
 /**
  * Cartoon-Style LEGO Brick Component
- * ONLY the brick appearance matches the cartoon reference image:
- * - Solid black outlines
+ * Matches the requested clean, playful design system:
+ * - Solid black outlines (weight 1.5)
  * - Smooth rounded edges
  * - Simple cylindrical studs with minimal highlights
- * - 2.5D perspective
  */
 const RealisticBrick: React.FC<{ 
   x: number, y: number, w: number, h: number, color: string, studs?: number, rotate?: number, className?: string, opacity?: string 
@@ -22,6 +21,7 @@ const RealisticBrick: React.FC<{
   const cornerRadius = 8;
   const depth = 6; 
   const studHeight = 5; 
+  const outlineWidth = 1.5;
   
   const studRows = studs > 4 ? 2 : 1;
   const studsPerRow = Math.ceil(studs / studRows);
@@ -34,11 +34,11 @@ const RealisticBrick: React.FC<{
       {/* 1. Base / Shadow Layer (Depth) */}
       <rect x={x} y={y + depth} width={w} height={h} rx={cornerRadius} fill={color} />
       <rect x={x} y={y + depth} width={w} height={h} rx={cornerRadius} fill="black" opacity="0.2" />
-      <rect x={x} y={y + depth} width={w} height={h} rx={cornerRadius} fill="none" stroke="black" strokeWidth="1.2" />
+      <rect x={x} y={y + depth} width={w} height={h} rx={cornerRadius} fill="none" stroke="black" strokeWidth={outlineWidth} />
 
       {/* 2. Top Face Layer */}
       <rect x={x} y={y} width={w} height={h} rx={cornerRadius} fill={color} />
-      <rect x={x} y={y} width={w} height={h} rx={cornerRadius} fill="none" stroke="black" strokeWidth="1.2" />
+      <rect x={x} y={y} width={w} height={h} rx={cornerRadius} fill="none" stroke="black" strokeWidth={outlineWidth} />
       
       {/* 3. Top Subtle Highlight (Edge) */}
       <path 
@@ -58,11 +58,11 @@ const RealisticBrick: React.FC<{
             {/* Stud Side */}
             <circle cx={cx} cy={cy} r={studRadius} fill={color} />
             <circle cx={cx} cy={cy} r={studRadius} fill="black" opacity="0.15" />
-            <circle cx={cx} cy={cy} r={studRadius} fill="none" stroke="black" strokeWidth="1.2" />
+            <circle cx={cx} cy={cy} r={studRadius} fill="none" stroke="black" strokeWidth={outlineWidth} />
             
             {/* Stud Top */}
             <circle cx={cx} cy={cy - studHeight} r={studRadius} fill={color} />
-            <circle cx={cx} cy={cy - studHeight} r={studRadius} fill="none" stroke="black" strokeWidth="1.2" />
+            <circle cx={cx} cy={cy - studHeight} r={studRadius} fill="none" stroke="black" strokeWidth={outlineWidth} />
             
             {/* Stud Highlight */}
             <circle cx={cx - studRadius * 0.25} cy={cy - studHeight - studRadius * 0.25} r={studRadius * 0.3} fill="white" opacity="0.3" />
