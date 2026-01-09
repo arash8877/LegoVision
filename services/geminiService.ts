@@ -16,14 +16,21 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
   
   STEP 1: Create an exact count and inventory of every brick visible. 
   - Note dimensions exactly (e.g., "1x4" is different from "2x4").
-  - Note quantity exactly (e.g., if there is only one "1x1 Red Brick", you cannot use two).
+  - Note quantity exactly.
   - Note colors exactly.
 
   STEP 2: Suggest 3 creative "micro-build" ideas.
   
+  CRITICAL PHYSICAL CONNECTION RULES:
+  1. STUD-TO-TUBE ONLY: Bricks must ONLY connect via studs on the top to tubes/holes on the bottom. 
+  2. NO SIDE GLUING: It is physically impossible to connect the flat sides of two standard bricks together. Do not suggest side-by-side connections unless one brick is placed ON TOP of another (overlapping) to bind them.
+  3. GRAVITY & CLUTCH: Every piece must be connected to the main structure. No floating pieces.
+  4. STABILITY: The build must be structurally sound. Use larger bricks as plates/bases to connect smaller ones.
+  5. LEGAL TECHNIQUES ONLY: Do not suggest "illegal" connections (e.g., wedging plates between studs or side-to-side friction).
+
   CRITICAL CONSTRAINTS FOR BUILD SUGGESTIONS:
   1. PHYSICAL POSSIBILITY: A human must be able to build this using ONLY the pieces in the photo.
-  2. STRICT BRICK COUNT: If the photo has one Green 1x4, the build MUST NOT use more than one Green 1x4. It cannot use a Green 2x4 if one isn't there.
+  2. STRICT BRICK COUNT: If the photo has one Green 1x4, the build MUST NOT use more than one Green 1x4. 
   3. NO SUBSTITUTIONS: Do not invent, hallucinate, or substitute any bricks.
   4. NO PIECE DUPLICATION: You cannot use the same physical brick for two different parts of the same build.
 
@@ -71,7 +78,8 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
                 },
                 steps: {
                   type: Type.ARRAY,
-                  items: { type: Type.STRING }
+                  items: { type: Type.STRING },
+                  description: "Step-by-step instructions. Ensure each step describes a valid physical connection (stud-to-tube)."
                 }
               },
               required: ["title", "icon", "description", "difficulty", "estimatedPieces", "requiredBricks", "steps"]
@@ -102,9 +110,13 @@ export async function generateBuildImage(
   
   const prompt = `Generate a stylized cartoon illustration of a completed LEGO micro-build called "${title}". 
   
+  STRICT PHYSICAL LOGIC:
+  - The model MUST show pieces connected via studs. 
+  - NO pieces should be floating or connected side-to-side without overlapping plates/bricks to hold them.
+  - It must look like a real, stable LEGO build.
+
   STRICT BRICK ADHERENCE:
   Use ONLY these bricks: ${requiredBricks.join(', ')}. 
-  - Do not use more bricks than listed. 
   - Match dimensions perfectly (e.g., if a 1x4 is listed, use a 1x4, NOT a 2x4).
 
   VISUAL CONSISTENCY RULES:
@@ -114,7 +126,7 @@ export async function generateBuildImage(
   4. NO TEXTURES: No plastic grain, no logos, no stickers. Just clean, stylized shapes.
   5. BACKGROUND: Solid, clean white background only.
 
-  The final result must look like a professional, clean UI illustration with perfectly consistent colors for each piece.`;
+  The final result must look like a professional, clean UI illustration with perfectly consistent colors and physically valid LEGO connections.`;
 
   const result = await ai.models.generateContent({
     model: 'gemini-2.5-flash-image',
