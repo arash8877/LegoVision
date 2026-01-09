@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import BrickButton from './components/BrickButton';
 import VisionModal from './components/VisionModal';
@@ -68,7 +69,7 @@ const App: React.FC = () => {
         view === 'landing' ? (
           <section className="max-w-7xl mx-auto px-6 py-16 grid lg:grid-cols-2 gap-16 items-center">
             <div className="space-y-10 text-center lg:text-left">
-              <div className="inline-block bg-legoRed text-white px-6 py-2 rounded-xl font-heading text-sm tracking-widest uppercase">Official AI Builder</div>
+              <div className="inline-block bg-legoRed text-white px-6 py-2 rounded-xl font-heading text-sm tracking-widest uppercase">AI-Powered Builder</div>
               <h2 className="font-heading text-7xl md:text-9xl text-legoBlue leading-none">
                 More than <br/> a pile of <br/>
                 <span className="text-legoRed">bricks.</span>

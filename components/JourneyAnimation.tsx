@@ -87,7 +87,9 @@ const JourneyAnimation: React.FC = () => {
 
       <div className="absolute top-8 left-8 flex items-center gap-2 font-mono text-[11px] text-legoBlue font-black tracking-widest uppercase z-50">
         <div className="w-2.5 h-2.5 bg-legoRed rounded-full animate-pulse shadow-[0_0_10px_rgba(201,26,9,1)]"></div>
-        <span>SYSTEM_SCANNING</span>
+        <span className="flex items-center">
+          Analyzing<span className="animate-dots w-4 text-left"></span>
+        </span>
       </div>
     </div>
   );

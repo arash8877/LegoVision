@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -77,6 +78,18 @@
         0%, 66.65% { opacity: 0; transform: scale(0.95); }
         66.66%, 99.99% { opacity: 1; transform: scale(1); }
         100% { opacity: 0; }
+      }
+
+      /* Ellipsis Animation */
+      @keyframes dots {
+        0%, 20% { content: ''; }
+        40% { content: '.'; }
+        60% { content: '..'; }
+        80%, 100% { content: '...'; }
+      }
+      .animate-dots::after {
+        content: '';
+        animation: dots 1.5s steps(1) infinite;
       }
     </style>
   <script type="importmap">
