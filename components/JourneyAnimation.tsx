@@ -10,43 +10,76 @@ const JourneyAnimation: React.FC = () => {
       <div className="absolute inset-y-0 w-[4px] bg-white z-50 animate-[scanner-beam_6s_infinite] shadow-[0_0_20px_white,0_0_10px_rgba(0,85,191,0.6)]"></div>
 
       <div className="relative w-full h-full p-8 md:p-12">
+        {/* PILE OF 16 BRICKS */}
         <div className="absolute inset-0 z-10 animate-[hide-pile_6s_infinite]">
           <svg viewBox="0 0 400 400" className="w-full h-full">
-            <RealisticBrick x={100} y={280} w={65} h={40} color="#0055BF" studs={8} rotate={15} />
-            <RealisticBrick x={170} y={300} w={85} h={35} color="#FFD500" studs={4} rotate={-5} />
-            <RealisticBrick x={250} y={270} w={75} h={45} color="#C91A09" studs={6} rotate={10} />
-            <RealisticBrick x={120} y={220} w={60} h={35} color="#FFFFFF" studs={4} rotate={35} />
-            <RealisticBrick x={220} y={240} w={70} h={40} color="#FFD500" studs={6} rotate={-10} />
-            <RealisticBrick x={160} y={190} w={50} h={50} color="#0055BF" studs={4} rotate={-20} />
+            {/* Red Inventory (2x 2x4, 2x 2x2) */}
+            <RealisticBrick x={50} y={280} w={90} h={45} color="#C91A09" studs={8} rotate={15} />
+            <RealisticBrick x={300} y={240} w={90} h={45} color="#C91A09" studs={8} rotate={-10} />
+            <RealisticBrick x={120} y={210} w={45} h={45} color="#C91A09" studs={4} rotate={35} />
+            <RealisticBrick x={210} y={180} w={45} h={45} color="#C91A09" studs={4} rotate={-20} />
+
+            {/* Blue Inventory (2x 2x4, 2x 2x2) */}
+            <RealisticBrick x={100} y={320} w={90} h={45} color="#0055BF" studs={8} rotate={-5} />
+            <RealisticBrick x={240} y={290} w={90} h={45} color="#0055BF" studs={8} rotate={20} />
+            <RealisticBrick x={60} y={220} w={45} h={45} color="#0055BF" studs={4} rotate={15} />
+            <RealisticBrick x={180} y={340} w={45} h={45} color="#0055BF" studs={4} rotate={-45} />
+
+            {/* Yellow Inventory (2x 2x4, 2x 2x2) */}
+            <RealisticBrick x={160} y={300} w={90} h={45} color="#FFD500" studs={8} rotate={10} />
+            <RealisticBrick x={40} y={340} w={90} h={45} color="#FFD500" studs={8} rotate={-15} />
+            <RealisticBrick x={260} y={200} w={45} h={45} color="#FFD500" studs={4} rotate={60} />
+            <RealisticBrick x={320} y={310} w={45} h={45} color="#FFD500" studs={4} rotate={-10} />
+
+            {/* White Inventory (2x 1x4, 2x 2x2) */}
+            <RealisticBrick x={140} y={250} w={90} h={25} color="#FFFFFF" studs={4} rotate={80} />
+            <RealisticBrick x={240} y={340} w={90} h={25} color="#FFFFFF" studs={4} rotate={5} />
+            <RealisticBrick x={10} y={300} w={45} h={45} color="#FFFFFF" studs={4} rotate={-30} />
+            <RealisticBrick x={330} y={180} w={45} h={45} color="#FFFFFF" studs={4} rotate={40} />
           </svg>
         </div>
 
+        {/* BUILDS REVEALED AFTER SCAN */}
         <div className="absolute inset-0 z-20 animate-[reveal-build_6s_infinite]">
           <svg viewBox="0 0 400 400" className="w-full h-full">
+            {/* Build 1: Duck (Strict Subset) */}
             <g className="animate-[figure-duck_18s_infinite]">
-              <RealisticBrick x={150} y={280} w={45} h={25} color="#C91A09" studs={2} />
-              <RealisticBrick x={215} y={280} w={45} h={25} color="#C91A09" studs={2} />
-              <RealisticBrick x={140} y={220} w={130} h={65} color="#FFD500" studs={8} />
-              <RealisticBrick x={165} y={160} w={85} h={65} color="#FFD500" studs={6} />
-              <RealisticBrick x={220} y={100} w={50} h={65} color="#FFD500" studs={4} />
-              <RealisticBrick x={215} y={65} w={75} h={45} color="#FFD500" studs={4} />
-              <circle cx={255} cy={85} r="6" fill="black" opacity="0.6" />
+              {/* Legs: 2x Red 2x2 */}
+              <RealisticBrick x={165} y={280} w={35} h={35} color="#C91A09" studs={4} />
+              <RealisticBrick x={200} y={280} w={35} h={35} color="#C91A09" studs={4} />
+              {/* Body: 1x Yellow 2x4 */}
+              <RealisticBrick x={155} y={215} w={90} h={45} color="#FFD500" studs={8} />
+              {/* Head: 1x Yellow 2x2 */}
+              <RealisticBrick x={155} y={170} w={45} h={45} color="#FFD500" studs={4} />
+              {/* Tail/Feather: 1x White 2x2 */}
+              <RealisticBrick x={235} y={200} w={25} h={25} color="#FFFFFF" studs={4} />
             </g>
+
+            {/* Build 2: Robot (Strict Subset) */}
             <g className="animate-[figure-robot_18s_infinite] opacity-0">
-               <RealisticBrick x={175} y={280} w={50} h={75} color="#C91A09" studs={4} />
-               <RealisticBrick x={235} y={280} w={50} h={75} color="#C91A09" studs={4} />
-               <RealisticBrick x={165} y={185} w={130} h={100} color="#0055BF" studs={8} />
-               <RealisticBrick x={210} y={120} w={50} h={75} color="#FFFFFF" studs={4} />
-               <circle cx={225} cy={145} r="4" fill="black" opacity="0.5" />
-               <circle cx={245} cy={145} r="4" fill="black" opacity="0.5" />
+              {/* Feet: 2x Blue 2x2 */}
+              <RealisticBrick x={170} y={280} w={30} h={30} color="#0055BF" studs={4} />
+              <RealisticBrick x={210} y={280} w={30} h={30} color="#0055BF" studs={4} />
+              {/* Body: 1x Blue 2x4 */}
+              <RealisticBrick x={165} y={200} w={80} h={80} color="#0055BF" studs={8} />
+              {/* Head: 1x White 2x2 */}
+              <RealisticBrick x={190} y={155} w={30} h={30} color="#FFFFFF" studs={4} />
+              {/* Arms: 2x White 1x4 */}
+              <RealisticBrick x={135} y={210} w={30} h={60} color="#FFFFFF" studs={4} rotate={15} />
+              <RealisticBrick x={245} y={210} w={30} h={60} color="#FFFFFF" studs={4} rotate={-15} />
             </g>
+
+            {/* Build 3: Rocket (Strict Subset) */}
             <g className="animate-[figure-car_18s_infinite] opacity-0">
-               <RealisticBrick x={130} y={260} w={200} h={40} color="#C91A09" studs={12} />
-               <circle cx={170} cy={305} r="22" fill="#222" />
-               <circle cx={290} cy={305} r="22" fill="#222" />
-               <circle cx={170} cy={305} r="8" fill="#555" />
-               <circle cx={290} cy={305} r="8" fill="#555" />
-               <RealisticBrick x={180} y={220} w={110} h={45} color="#0055BF" opacity="0.6" studs={4} />
+              {/* Base Fins: 2x Yellow 2x2 */}
+              <RealisticBrick x={140} y={260} w={40} h={40} color="#FFD500" studs={4} rotate={-20} />
+              <RealisticBrick x={220} y={260} w={40} h={40} color="#FFD500" studs={4} rotate={20} />
+              {/* Bottom Stage: 1x Yellow 2x4 */}
+              <RealisticBrick x={155} y={250} w={90} h={45} color="#FFD500" studs={8} />
+              {/* Mid Stage: 1x Red 2x4 */}
+              <RealisticBrick x={155} y={205} w={90} h={45} color="#C91A09" studs={8} />
+              {/* Top Section: 1x Blue 2x4 */}
+              <RealisticBrick x={155} y={160} w={90} h={45} color="#0055BF" studs={8} />
             </g>
           </svg>
         </div>
