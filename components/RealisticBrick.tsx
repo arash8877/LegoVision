@@ -18,21 +18,42 @@ interface RealisticBrickProps {
  * Enforces uniform color rules:
  * - Sides use the same base color with a simple opacity overlay for shading.
  * - Studs match the body color perfectly.
+ * - Proportional logic ensures studs look identical across different brick sizes (1x4, 2x2, 2x4).
  */
 const RealisticBrick: React.FC<RealisticBrickProps> = ({ 
   x, y, w, h, color, studs = 0, rotate = 0, className = "", opacity = "1" 
 }) => {
-  const cornerRadius = 10;
+  const cornerRadius = 8;
   const faceDepth = 12; 
   const studTopHeight = 6; 
-  const outlineColor = "rgba(0,0,0,0.2)";
-  const outlineWidth = 1.5;
+  const outlineColor = "rgba(0,0,0,0.15)";
+  const outlineWidth = 1.2;
   
-  const studRows = studs > 4 ? 2 : 1;
+  // Logic to determine stud grid arrangement
+  // Standard LEGO bricks are categorized by stud rows (usually 1 or 2)
+  const isSquare = Math.abs(w - h) < 15;
+  const isNarrow = Math.min(w, h) < 30; // Typically 1x bricks or plates
+  
+  let studRows = 1;
+  if (studs > 4) {
+    studRows = 2; // e.g. 2x3, 2x4
+  } else if (isSquare && studs === 4) {
+    studRows = 2; // 2x2 configuration
+  } else if (studs === 4 && !isNarrow) {
+    // Catch-all for compact bricks that might not be perfectly square
+    studRows = 2; 
+  }
+
   const studsPerRow = Math.ceil(studs / studRows);
-  const studSpacingX = w / (studsPerRow + 1);
-  const studSpacingY = h / (studRows + 1);
-  const studRadius = (w / (studsPerRow + 1)) * 0.42;
+
+  // Calculate the physical area each stud occupies
+  const cellW = w / studsPerRow;
+  const cellH = h / studRows;
+  
+  // To keep studs consistent across different shapes (e.g. 1x4 plate vs 2x2 brick),
+  // we use a proportional radius based on the smallest grid dimension.
+  // We use 0.42 of the cell dimension for a "chunky", high-quality look.
+  const studRadius = Math.min(cellW, cellH) * 0.42;
 
   return (
     <g transform={`rotate(${rotate} ${x + w/2} ${y + h/2})`} className={`${className} select-none`} opacity={opacity}>
@@ -55,7 +76,7 @@ const RealisticBrick: React.FC<RealisticBrickProps> = ({
         height={h + (faceDepth / 2)} 
         rx={cornerRadius} 
         fill="black" 
-        opacity="0.15" 
+        opacity="0.12" 
       />
       <rect 
         x={x} 
@@ -68,7 +89,7 @@ const RealisticBrick: React.FC<RealisticBrickProps> = ({
         strokeWidth={outlineWidth} 
       />
 
-      {/* 3. Top Face (Main color) */}
+      {/* 3. Top Face (Main body color) */}
       <rect 
         x={x} 
         y={y} 
@@ -88,24 +109,26 @@ const RealisticBrick: React.FC<RealisticBrickProps> = ({
         strokeWidth={outlineWidth} 
       />
 
-      {/* 4. Studs (Matching Body Color) */}
+      {/* 4. Studs (Matching Body Color exactly) */}
       {Array.from({ length: studs }).map((_, i) => {
         const row = Math.floor(i / studsPerRow);
         const col = i % studsPerRow;
-        const cx = x + (col + 1) * studSpacingX;
-        const cy = y + (row + 1) * studSpacingY;
+        
+        // Center the stud in its allocated grid cell
+        const cx = x + (col + 0.5) * cellW;
+        const cy = y + (row + 0.5) * cellH;
 
         return (
           <g key={i}>
             {/* Stud Side */}
             <circle cx={cx} cy={cy} r={studRadius} fill={color} />
-            <circle cx={cx} cy={cy} r={studRadius} fill="black" opacity="0.1" />
+            <circle cx={cx} cy={cy} r={studRadius} fill="black" opacity="0.08" />
             <circle cx={cx} cy={cy} r={studRadius} fill="none" stroke={outlineColor} strokeWidth={outlineWidth} />
             
-            {/* Stud Top - Same Color */}
+            {/* Stud Top - Using same base color */}
             <circle cx={cx} cy={cy - studTopHeight} r={studRadius} fill={color} />
             
-            {/* Stud Highlight (Stylized) */}
+            {/* Stud Highlight (Stylized cartoon shine) */}
             <circle cx={cx - (studRadius * 0.3)} cy={cy - studTopHeight - (studRadius * 0.3)} r={studRadius * 0.25} fill="white" opacity="0.3" />
             
             {/* Stud Outline */}
