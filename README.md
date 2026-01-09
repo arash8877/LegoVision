@@ -1,13 +1,13 @@
-# BrickVision
+# LegoVision
 
-**BrickVision** is an advanced AI-powered companion for LEGO® enthusiasts. It leverages cutting-edge computer vision to identify a physical pile of loose bricks and intelligently suggests creative "micro-builds" that can be constructed using only the pieces identified in the original photo.
+**LegoVision** is an advanced AI-powered companion for LEGO® enthusiasts. It leverages cutting-edge computer vision to identify a physical pile of loose bricks and intelligently suggests creative "micro-builds" that can be constructed using only the pieces identified in the original photo.
 
 This project serves as a showcase of modern frontend engineering, sophisticated AI orchestration, and high-fidelity UI/UX design.
 
 ## 🚀 Key Features
 
 - **Precision Computer Vision**: Analyzes uploaded photos to generate a pixel-perfect inventory of LEGO bricks, identifying exact dimensions (e.g., 1x4 vs 2x4) and quantities.
-- **Strictly Feasible Suggestions**: Unlike standard AI chat interfaces, BrickVision enforces a "Physical Subset Rule"—all suggested builds must be 100% constructible with the specific bricks visible in the user's photo.
+- **Strictly Feasible Suggestions**: Unlike standard AI chat interfaces, LegoVision enforces a "Physical Subset Rule"—all suggested builds must be 100% constructible with the specific bricks visible in the user's photo.
 - **AI Blueprint Projection**: Dynamically generates stylized, cartoon-accurate 2.5D illustrations of the completed builds using generative image models.
 - **Immersive "Bricky" UI**: A custom-designed interface featuring interactive 2.5D SVG-based bricks, scanning animations, and a vibrant palette inspired by classic building sets.
 - **Mobile-Responsive Design**: Optimized for a seamless "snap and build" experience on any device.
@@ -24,7 +24,7 @@ This project serves as a showcase of modern frontend engineering, sophisticated 
 - **Visuals**: Utilizes **Gemini 2.5 Flash Image** with refined prompt engineering to produce consistent, stylized build manuals.
 
 ### Design Principles
-- **Separation of Concerns**: The codebase is strictly modularized into specialized components (e.g., `RealisticBrick`, `VisionModal`, `BuildCard`) and service modules for AI interactions.
+- **Separation of Concerns**: The codebase is strictly modularized into specialized components (e.g., `RealisticBrick`, `VisionModal`, `BuildCard`) and service modules for AI integrations.
 - **Performance**: Efficient handling of base64 image data and asynchronous state management to provide a smooth user experience during heavy AI processing.
 
 ## 🏗️ Project Structure

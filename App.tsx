@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import BrickButton from './components/BrickButton';
 import VisionModal from './components/VisionModal';
@@ -52,7 +51,7 @@ const App: React.FC = () => {
               {[1,2,3,4].map(i => <div key={i} className="w-2.5 h-2.5 bg-white/40 rounded-full"></div>)}
             </div>
           </div>
-          <h1 className="font-heading text-3xl text-legoBlue">BrickVision</h1>
+          <h1 className="font-heading text-3xl text-legoBlue">LegoVision</h1>
         </div>
         <BrickButton variant="blue" className="!text-sm !px-6" onClick={() => setIsModalOpen(true)}>
           {view === 'results' ? 'Rescan' : 'Analyze Now'}
@@ -95,7 +94,7 @@ const App: React.FC = () => {
       
       {view === 'landing' && !isLoading && (
         <footer className="bg-legoBlue text-white py-16 text-center border-t-[10px] border-legoYellow">
-          <p className="font-black opacity-30 uppercase tracking-[0.4em] text-xs">BrickVision Lab // Powered by Gemini</p>
+          <p className="font-black opacity-30 uppercase tracking-[0.4em] text-xs">LegoVision Lab // Powered by Gemini</p>
         </footer>
       )}
     </div>

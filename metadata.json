@@ -1,5 +1,5 @@
 {
-  "name": "BrickVision",
+  "name": "LegoVision",
   "description": "Unlock your imagination by turning your messy pile of bricks into brilliant new building ideas using AI Vision.",
   "requestFramePermissions": [
     "camera"
