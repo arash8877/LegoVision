@@ -12,32 +12,34 @@ import { VisionAnalysis } from "../types";
 export async function analyzeBrickPile(base64Image: string): Promise<VisionAnalysis> {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  const prompt = `Analyze this photo of LEGO bricks with 100% precision. 
+  const prompt = `Analyze this photo of LEGO bricks with absolute, 100% surgical precision. 
   
-  STEP 1: Create an exact count and inventory of every brick visible. 
-  - Note dimensions exactly (e.g., "1x4" is different from "2x4").
-  - Note quantity exactly.
-  - Note colors exactly.
+  PHASE 1: INVENTORY (MANDATORY)
+  Identify every single physical LEGO brick visible in the image. 
+  - COUNT: Exactly how many of each unique brick exist.
+  - TYPE/DIMENSIONS: Exact studs (e.g., "2x2", "1x4", "2x4").
+  - COLOR: Exact color (e.g., "Bright Red", "Dark Blue", "Yellow").
+  - CATEGORY: Brick, Plate, Slope, Tile, or Special.
 
-  STEP 2: Suggest 3 creative "micro-build" ideas.
+  PHASE 2: SUGGESTIONS (STRICT CONSTRAINTS)
+  Suggest 3 creative "micro-build" ideas based ONLY on the inventory from Phase 1.
   
+  ZERO HALLUCINATION INVENTORY RULES:
+  1. NO EXTRA PIECES: If the image contains 5 red 2x4 bricks, a suggestion CANNOT use 6 red 2x4 bricks.
+  2. NO SUBSTITUTIONS: If the user has a 2x4 brick, you cannot suggest they use two 2x2 bricks instead.
+  3. NO COLOR CHANGES: You must use the exact colors identified in the image.
+  4. PIECE DEPLETION: In a single build, once a physical brick is used in Step 1, it is gone. It cannot be used again in Step 2.
+  5. SUBSET ONLY: Each build must be a subset of the total physical inventory identified in Phase 1.
+
   CRITICAL PHYSICAL CONNECTION RULES:
   1. STUD-TO-TUBE ONLY: Bricks must ONLY connect via studs on the top to tubes/holes on the bottom. 
-  2. NO SIDE GLUING: It is physically impossible to connect the flat sides of two standard bricks together. Do not suggest side-by-side connections unless one brick is placed ON TOP of another (overlapping) to bind them.
-  3. GRAVITY & CLUTCH: Every piece must be connected to the main structure. No floating pieces.
-  4. STABILITY: The build must be structurally sound. Use larger bricks as plates/bases to connect smaller ones.
-  5. LEGAL TECHNIQUES ONLY: Do not suggest "illegal" connections (e.g., wedging plates between studs or side-to-side friction).
-
-  CRITICAL CONSTRAINTS FOR BUILD SUGGESTIONS:
-  1. PHYSICAL POSSIBILITY: A human must be able to build this using ONLY the pieces in the photo.
-  2. STRICT BRICK COUNT: If the photo has one Green 1x4, the build MUST NOT use more than one Green 1x4. 
-  3. NO SUBSTITUTIONS: Do not invent, hallucinate, or substitute any bricks.
-  4. NO PIECE DUPLICATION: You cannot use the same physical brick for two different parts of the same build.
+  2. NO SIDE GLUING: Side-to-side connections without overlapping bricks to "lock" them are impossible.
+  3. LEGAL TECHNIQUES ONLY: No "illegal" stress-inducing connections.
 
   Return the result in valid JSON format matching the schema provided.`;
 
   const result = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
+    model: "gemini-3-pro-preview", // Upgrading to Pro for stricter logic adherence
     contents: {
       parts: [
         { inlineData: { data: base64Image, mimeType: "image/jpeg" } },
@@ -52,7 +54,7 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
           identifiedBricks: {
             type: Type.ARRAY,
             items: { type: Type.STRING },
-            description: "Detailed list of all bricks identified (e.g. '1x Red 2x4 Brick', '2x Blue 1x2 Plate')"
+            description: "Detailed list of every single brick identified (e.g. '1x Red 2x4 Brick', '3x Blue 1x2 Plate')"
           },
           colorPalette: {
             type: Type.ARRAY,
@@ -74,12 +76,12 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
                 requiredBricks: {
                   type: Type.ARRAY,
                   items: { type: Type.STRING },
-                  description: "The specific subset of identified bricks used, including their exact quantities."
+                  description: "The specific subset of identified bricks used, including their exact quantities and colors. Must not exceed total inventory."
                 },
                 steps: {
                   type: Type.ARRAY,
                   items: { type: Type.STRING },
-                  description: "Step-by-step instructions. Ensure each step describes a valid physical connection (stud-to-tube)."
+                  description: "Step-by-step instructions using ONLY the requiredBricks for this build."
                 }
               },
               required: ["title", "icon", "description", "difficulty", "estimatedPieces", "requiredBricks", "steps"]
@@ -97,7 +99,7 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
     return JSON.parse(jsonStr) as VisionAnalysis;
   } catch (error) {
     console.error("Failed to parse Gemini response:", error);
-    throw new Error("Could not analyze your bricks. Please try again with a clearer photo.");
+    throw new Error("Could not analyze your bricks with the required precision. Please try again with a clearer photo.");
   }
 }
 
@@ -108,25 +110,23 @@ export async function generateBuildImage(
 ): Promise<string> {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  const prompt = `Generate a stylized cartoon illustration of a completed LEGO micro-build called "${title}". 
+  const prompt = `Generate a stylized cartoon illustration of the completed LEGO micro-build called "${title}". 
   
-  STRICT PHYSICAL LOGIC:
-  - The model MUST show pieces connected via studs. 
-  - NO pieces should be floating or connected side-to-side without overlapping plates/bricks to hold them.
-  - It must look like a real, stable LEGO build.
+  STRICT INVENTORY ADHERENCE:
+  You MUST visualize ONLY these specific pieces: ${requiredBricks.join(', ')}. 
+  - Match colors exactly to the list.
+  - Match dimensions (stud count) exactly to the list.
+  - Do NOT add any extra pieces that are not in the list.
 
-  STRICT BRICK ADHERENCE:
-  Use ONLY these bricks: ${requiredBricks.join(', ')}. 
-  - Match dimensions perfectly (e.g., if a 1x4 is listed, use a 1x4, NOT a 2x4).
+  PHYSICAL LOGIC:
+  - Every connection must be via studs (stud-to-tube).
+  - The model must be structurally sound and physically buildable.
+  - NO side-to-side floating pieces.
 
-  VISUAL CONSISTENCY RULES:
-  1. UNIFORM COLOR: Each brick must have a single, consistent base color. The sides of the brick must be the same color as the top (only slightly darker for shading).
-  2. MATCHING STUDS: The circular studs on top of each brick MUST be the exact same color as the brick's body.
-  3. CARTOON STYLE: 2.5D perspective, thick black outlines, flat colors.
-  4. NO TEXTURES: No plastic grain, no logos, no stickers. Just clean, stylized shapes.
-  5. BACKGROUND: Solid, clean white background only.
-
-  The final result must look like a professional, clean UI illustration with perfectly consistent colors and physically valid LEGO connections.`;
+  VISUAL STYLE:
+  - 2.5D perspective, clean thick black outlines.
+  - Solid, consistent base colors (studs must match the brick body).
+  - Professional UI illustration style on a pure white background.`;
 
   const result = await ai.models.generateContent({
     model: 'gemini-2.5-flash-image',
