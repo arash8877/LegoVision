@@ -36,6 +36,9 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
   2. NO SIDE GLUING: Side-to-side connections without overlapping bricks to "lock" them are impossible.
   3. LEGAL TECHNIQUES ONLY: No "illegal" stress-inducing connections.
 
+  VISUAL ICON RULES:
+  - The 'icon' field MUST be a single representative emoji character only. Do not use text descriptions or labels in the icon field.
+
   Return the result in valid JSON format matching the schema provided.`;
 
   const result = await ai.models.generateContent({
@@ -66,7 +69,10 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
               type: Type.OBJECT,
               properties: {
                 title: { type: Type.STRING },
-                icon: { type: Type.STRING },
+                icon: { 
+                  type: Type.STRING,
+                  description: "A single representative Emoji character only. Strictly no text."
+                },
                 description: { type: Type.STRING },
                 difficulty: { 
                   type: Type.STRING,

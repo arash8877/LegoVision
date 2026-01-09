@@ -36,13 +36,21 @@ const BuildCard: React.FC<BuildCardProps> = ({ build, sourceImage }) => {
     }
   }, [showDetails, buildImage, isGeneratingImage, build.title, build.requiredBricks, sourceImage]);
 
+  // Robust scaling logic: if the icon is unexpectedly long text, shrink the font size
+  const isEmoji = build.icon.length <= 4; // Most emojis are small strings or surrogate pairs
+  const iconSizeClass = isEmoji ? 'text-5xl' : 'text-xl font-black uppercase tracking-tight text-center';
+
   return (
     <div className={`
       bg-white rounded-[2rem] border-4 border-legoBlue shadow-lg overflow-hidden flex flex-col transition-all duration-300
       ${showDetails ? 'ring-8 ring-legoYellow/30 scale-[1.02]' : 'hover:scale-[1.03]'}
     `}>
-      <div className="bg-legoBlue p-6 flex justify-between items-center text-white relative">
-        <span className="text-5xl filter drop-shadow-lg leading-none">{build.icon}</span>
+      <div className="bg-legoBlue p-6 flex justify-between items-center text-white relative min-h-[110px]">
+        <div className="flex items-center justify-center w-16 h-16 bg-white/10 rounded-2xl border border-white/20 shadow-inner overflow-hidden">
+          <span className={`${iconSizeClass} filter drop-shadow-lg leading-none select-none`}>
+            {build.icon}
+          </span>
+        </div>
         <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/30">
           <span className="text-[10px] font-black uppercase tracking-widest">{build.difficulty}</span>
         </div>
