@@ -26,8 +26,15 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
   - CATEGORY: Brick, Plate, Slope, Tile, or Special.
 
   PHASE 2: SUGGESTIONS (STRICT CONSTRAINTS)
-  Suggest 3 creative "micro-build" ideas based ONLY on the inventory from Phase 1.
+  Suggest EXACTLY 3 creative "micro-build" ideas based ONLY on the inventory from Phase 1.
   
+  DIFFICULTY SCALING RULES:
+  You MUST provide a range of challenges. Generate exactly:
+  1. ONE 'Easy' build: Simple structure, few pieces, very stable.
+  2. ONE 'Medium' build: Moderate complexity, clever piece usage.
+  3. ONE 'Hard' build: Complex structure, advanced spatial reasoning, maximizing the available inventory for detail.
+  - If the inventory is very small, scale the complexity of these 3 levels relative to what is possible with the available pieces.
+
   ZERO HALLUCINATION INVENTORY RULES:
   1. NO EXTRA PIECES: If the image contains 5 red 2x4 bricks, a suggestion CANNOT use 6 red 2x4 bricks.
   2. NO SUBSTITUTIONS: If the user has a 2x4 brick, you cannot suggest they use two 2x2 bricks instead.
@@ -80,7 +87,7 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
                 description: { type: Type.STRING },
                 difficulty: { 
                   type: Type.STRING,
-                  description: "Must be 'Easy', 'Medium', or 'Hard'"
+                  description: "Must be exactly 'Easy', 'Medium', or 'Hard'"
                 },
                 estimatedPieces: { type: Type.NUMBER },
                 requiredBricks: {
