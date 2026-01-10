@@ -12,9 +12,13 @@ import { VisionAnalysis } from "../types";
 export async function analyzeBrickPile(base64Image: string): Promise<VisionAnalysis> {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  const prompt = `Analyze this photo of LEGO bricks with absolute, 100% surgical precision. 
+  const prompt = `Analyze this photo with absolute, 100% surgical precision. 
   
-  PHASE 1: INVENTORY (MANDATORY)
+  PHASE 0: VALIDATION
+  First, determine if the image contains physical LEGO® bricks. 
+  - If NO LEGO bricks are detected: You MUST return empty arrays for 'identifiedBricks', 'colorPalette', and 'suggestions'. Do not attempt to guess or invent builds.
+
+  PHASE 1: INVENTORY (MANDATORY IF BRICKS PRESENT)
   Identify every single physical LEGO brick visible in the image. 
   - COUNT: Exactly how many of each unique brick exist.
   - TYPE/DIMENSIONS: Exact studs (e.g., "2x2", "1x4", "2x4").
@@ -57,7 +61,7 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
           identifiedBricks: {
             type: Type.ARRAY,
             items: { type: Type.STRING },
-            description: "Detailed list of every single brick identified (e.g. '1x Red 2x4 Brick', '3x Blue 1x2 Plate')"
+            description: "Detailed list of every single brick identified (e.g. '1x Red 2x4 Brick', '3x Blue 1x2 Plate'). Empty if no LEGO found."
           },
           colorPalette: {
             type: Type.ARRAY,

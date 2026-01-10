@@ -21,6 +21,8 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   onRegenerate,
   isRegenerating = false
 }) => {
+  const noBricksFound = result.identifiedBricks.length === 0;
+
   return (
     <div className="min-h-screen bg-legoGray flex flex-col animate-in fade-in duration-500">
       {/* Header Bar */}
@@ -47,44 +49,67 @@ const ResultsView: React.FC<ResultsViewProps> = ({
               <div className="aspect-square relative group">
                 <img src={sourceImage} alt="Original Pile" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-legoBlue/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                   <span className="bg-white text-legoBlue text-[10px] font-black px-2 py-1 rounded shadow-sm">YOUR PILE</span>
+                   <span className="bg-white text-legoBlue text-[10px] font-black px-2 py-1 rounded shadow-sm">YOUR PHOTO</span>
                 </div>
               </div>
               <div className="p-5 bg-legoBlue/5">
                 <h3 className="font-heading text-legoBlue text-sm mb-3 uppercase tracking-tight">Identified Bricks</h3>
                 <div className="flex flex-wrap gap-2">
-                  {result.identifiedBricks.map((brick, i) => (
-                    <span key={i} className="bg-white px-2 py-1 rounded-md text-[10px] font-bold border border-legoBlue/10 shadow-sm text-gray-700">
-                      {brick}
-                    </span>
-                  ))}
+                  {!noBricksFound ? (
+                    result.identifiedBricks.map((brick, i) => (
+                      <span key={i} className="bg-white px-2 py-1 rounded-md text-[10px] font-bold border border-legoBlue/10 shadow-sm text-gray-700">
+                        {brick}
+                      </span>
+                    ))
+                  ) : (
+                    <div className="w-full py-2">
+                      <p className="text-legoRed text-[10px] font-black uppercase tracking-tight leading-tight">
+                        No LEGO pieces were found in this image.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Main Suggestions Grid */}
+          {/* Main Suggestions Grid / Empty State */}
           <div className="lg:col-span-3">
-            <div className="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
-              <div>
-                <h2 className="font-heading text-3xl md:text-4xl text-legoBlue mb-2">3 New Possibilities</h2>
-                <p className="text-gray-600 font-semibold italic">Customized to your exact pieces and colors.</p>
+            {noBricksFound ? (
+              <div className="bg-white rounded-[3rem] p-12 md:p-20 text-center border-4 border-dashed border-legoBlue/20 shadow-inner animate-in zoom-in duration-500">
+                 <div className="text-8xl mb-8 transform hover:rotate-12 transition-transform cursor-default">🏜️</div>
+                 <h2 className="font-heading text-4xl md:text-5xl text-legoBlue mb-6">Zero Bricks Detected</h2>
+                 <p className="text-xl text-gray-500 font-bold max-w-xl mx-auto italic mb-10 leading-relaxed">
+                   We scanned your image but couldn't find any identifiable LEGO® pieces. Try taking a photo with better lighting on a solid background!
+                 </p>
+                 <BrickButton variant="red" className="!px-12 !py-5 !text-2xl" onClick={onNewScan}>
+                   Try Another Photo 📸
+                 </BrickButton>
               </div>
-              <BrickButton 
-                variant="red" 
-                className="!py-2 !px-6 !text-base shrink-0 sm:self-end" 
-                onClick={onRegenerate}
-                disabled={isRegenerating}
-              >
-                {isRegenerating ? 'Thinking...' : 'Regenerate Ideas ✨'}
-              </BrickButton>
-            </div>
+            ) : (
+              <>
+                <div className="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+                  <div>
+                    <h2 className="font-heading text-3xl md:text-4xl text-legoBlue mb-2">3 New Possibilities</h2>
+                    <p className="text-gray-600 font-semibold italic">Customized to your exact pieces and colors.</p>
+                  </div>
+                  <BrickButton 
+                    variant="red" 
+                    className="!py-2 !px-6 !text-base shrink-0 sm:self-end" 
+                    onClick={onRegenerate}
+                    disabled={isRegenerating}
+                  >
+                    {isRegenerating ? 'Thinking...' : 'Regenerate Ideas ✨'}
+                  </BrickButton>
+                </div>
 
-            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8 mb-12">
-              {result.suggestions.map((build, i) => (
-                <BuildCard key={`${build.title}-${i}`} build={build} sourceImage={sourceImage} />
-              ))}
-            </div>
+                <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8 mb-12">
+                  {result.suggestions.map((build, i) => (
+                    <BuildCard key={`${build.title}-${i}`} build={build} sourceImage={sourceImage} />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </main>
