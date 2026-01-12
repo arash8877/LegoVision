@@ -109,11 +109,6 @@ const BuildCard: React.FC<BuildCardProps> = ({ build, sourceImage }) => {
                  </div>
                )}
             </div>
-            <div className="mt-4 flex justify-center">
-              <div className="px-4 py-1.5 bg-legoBlue/10 rounded-full text-[10px] font-black text-legoBlue uppercase tracking-widest text-center">
-                AI Blueprint Projection 🧱
-              </div>
-            </div>
           </div>
         </div>
       )}

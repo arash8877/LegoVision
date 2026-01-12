@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import BrickButton from './components/BrickButton';
 import VisionModal from './components/VisionModal';
@@ -49,7 +48,7 @@ const App: React.FC = () => {
         <div className="flex items-center gap-4 cursor-pointer" onClick={handleReset}>
           <div className="w-12 h-12 bg-legoRed rounded-xl shadow-lego flex items-center justify-center">
             <div className="grid grid-cols-2 gap-1.5">
-              {[1,2,3,4].map(i => <div key={i} className="w-2.5 h-2.5 bg-white/40 rounded-full"></div>)}
+              {[1, 2, 3, 4].map(i => <div key={i} className="w-2.5 h-2.5 bg-white/40 rounded-full"></div>)}
             </div>
           </div>
           <h1 className="font-heading text-3xl text-legoBlue">LegoVision</h1>
@@ -72,7 +71,7 @@ const App: React.FC = () => {
               <div className="space-y-10 text-center lg:text-left">
                 <div className="inline-block bg-legoRed text-white px-6 py-2 rounded-xl font-heading text-sm tracking-widest uppercase">AI-Powered Builder</div>
                 <h2 className="font-heading text-7xl md:text-9xl text-legoBlue leading-none">
-                  More than <br/> a pile of <br/>
+                  More than <br /> a pile of <br />
                   <span className="text-legoRed">bricks.</span>
                 </h2>
                 <p className="text-2xl text-gray-500 font-bold max-w-xl mx-auto lg:mx-0">Turn your loose pieces into creative micro-builds using advanced computer vision.</p>
@@ -88,7 +87,7 @@ const App: React.FC = () => {
                   <h3 className="font-heading text-5xl text-legoBlue uppercase tracking-tighter">Your Journey</h3>
                   <div className="w-24 h-2 bg-legoRed mx-auto mt-4 rounded-full"></div>
                 </div>
-                
+
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12">
                   {/* Step 1 */}
                   <div className="bg-white p-8 rounded-[2.5rem] border-4 border-legoBlue shadow-lego-blue flex flex-col items-center text-center group">
