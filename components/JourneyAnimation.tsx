@@ -72,7 +72,7 @@ const JourneyAnimation: React.FC = () => {
               <RealisticBrick x={235} y={195} w={20} h={20} color="#FFFFFF" studs={4} />
             </g>
 
-            {/* Build 2: Robot (Redesigned for clarity) */}
+            {/* Build 2: Robot (Fixed arms) */}
             <g className="animate-[figure-robot_18s_infinite] opacity-0">
               {/* Feet: 2x Blue 2x2 */}
               <RealisticBrick x={180} y={285} w={20} h={20} color="#0055BF" studs={4} />
