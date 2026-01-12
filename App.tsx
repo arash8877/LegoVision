@@ -67,18 +67,60 @@ const App: React.FC = () => {
         </div>
       ) : (
         view === 'landing' ? (
-          <section className="max-w-7xl mx-auto px-6 py-16 grid lg:grid-cols-2 gap-16 items-center">
-            <div className="space-y-10 text-center lg:text-left">
-              <div className="inline-block bg-legoRed text-white px-6 py-2 rounded-xl font-heading text-sm tracking-widest uppercase">AI-Powered Builder</div>
-              <h2 className="font-heading text-7xl md:text-9xl text-legoBlue leading-none">
-                More than <br/> a pile of <br/>
-                <span className="text-legoRed">bricks.</span>
-              </h2>
-              <p className="text-2xl text-gray-500 font-bold max-w-xl mx-auto lg:mx-0">Turn your loose pieces into creative micro-builds using advanced computer vision.</p>
-              <BrickButton onClick={() => setIsModalOpen(true)} className="!px-12 !py-6 !text-3xl !rounded-3xl shadow-lego">Snap a Photo ✨</BrickButton>
-            </div>
-            <JourneyAnimation />
-          </section>
+          <>
+            <section className="max-w-7xl mx-auto px-6 py-16 grid lg:grid-cols-2 gap-16 items-center">
+              <div className="space-y-10 text-center lg:text-left">
+                <div className="inline-block bg-legoRed text-white px-6 py-2 rounded-xl font-heading text-sm tracking-widest uppercase">AI-Powered Builder</div>
+                <h2 className="font-heading text-7xl md:text-9xl text-legoBlue leading-none">
+                  More than <br/> a pile of <br/>
+                  <span className="text-legoRed">bricks.</span>
+                </h2>
+                <p className="text-2xl text-gray-500 font-bold max-w-xl mx-auto lg:mx-0">Turn your loose pieces into creative micro-builds using advanced computer vision.</p>
+                <BrickButton onClick={() => setIsModalOpen(true)} className="!px-12 !py-6 !text-3xl !rounded-3xl shadow-lego">Snap a Photo ✨</BrickButton>
+              </div>
+              <JourneyAnimation />
+            </section>
+
+            {/* Visual How It Works Section */}
+            <section className="bg-legoGray py-24 px-6 border-y-[12px] border-legoYellow">
+              <div className="max-w-7xl mx-auto">
+                <div className="text-center mb-16">
+                  <h3 className="font-heading text-5xl text-legoBlue uppercase tracking-tighter">Your Journey</h3>
+                  <div className="w-24 h-2 bg-legoRed mx-auto mt-4 rounded-full"></div>
+                </div>
+                
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12">
+                  {/* Step 1 */}
+                  <div className="bg-white p-8 rounded-[2.5rem] border-4 border-legoBlue shadow-lego-blue flex flex-col items-center text-center group">
+                    <div className="w-20 h-20 bg-legoRed rounded-2xl shadow-lego flex items-center justify-center text-4xl mb-6 group-hover:rotate-12 transition-transform">🧱</div>
+                    <h4 className="font-heading text-2xl text-legoBlue mb-2">1. Gather</h4>
+                    <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Find your loose bricks</p>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div className="bg-white p-8 rounded-[2.5rem] border-4 border-legoBlue shadow-lego-blue flex flex-col items-center text-center group">
+                    <div className="w-20 h-20 bg-legoYellow rounded-2xl shadow-lego-yellow flex items-center justify-center text-4xl mb-6 group-hover:-rotate-12 transition-transform">📸</div>
+                    <h4 className="font-heading text-2xl text-legoBlue mb-2">2. Snap</h4>
+                    <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Take a clear photo</p>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div className="bg-white p-8 rounded-[2.5rem] border-4 border-legoBlue shadow-lego-blue flex flex-col items-center text-center group">
+                    <div className="w-20 h-20 bg-legoBlue rounded-2xl shadow-lego-blue flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition-transform">🔍</div>
+                    <h4 className="font-heading text-2xl text-legoBlue mb-2">3. Analyze</h4>
+                    <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">AI scans every piece</p>
+                  </div>
+
+                  {/* Step 4 */}
+                  <div className="bg-white p-8 rounded-[2.5rem] border-4 border-legoBlue shadow-lego-blue flex flex-col items-center text-center group">
+                    <div className="w-20 h-20 bg-legoRed rounded-2xl shadow-lego flex items-center justify-center text-4xl mb-6 group-hover:rotate-6 transition-transform">🚀</div>
+                    <h4 className="font-heading text-2xl text-legoBlue mb-2">4. Build</h4>
+                    <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Construct your world</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </>
         ) : (
           <ResultsView 
             result={analysisResult!} 
@@ -94,7 +136,7 @@ const App: React.FC = () => {
       <VisionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onScan={handleScanRequest} />
       
       {view === 'landing' && !isLoading && (
-        <footer className="bg-legoBlue text-white py-16 text-center border-t-[10px] border-legoYellow">
+        <footer className="bg-legoBlue text-white py-16 text-center">
           <p className="font-black opacity-30 uppercase tracking-[0.4em] text-xs">LegoVision Lab // Powered by Gemini</p>
         </footer>
       )}
