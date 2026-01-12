@@ -56,54 +56,62 @@ const JourneyAnimation: React.FC = () => {
         {/* BUILDS REVEALED AFTER SCAN */}
         <div className="absolute inset-0 z-20 animate-[reveal-build_6s_infinite]">
           <svg viewBox="0 0 400 400" className="w-full h-full">
-            {/* Build 1: Duck (Improved detail with subset) */}
+            {/* Build 1: Duck */}
             <g className="animate-[figure-duck_18s_infinite]">
-              {/* Legs: 2x Red 2x2 */}
-              <RealisticBrick x={175} y={260} w={25} h={25} color="#C91A09" studs={4} />
-              <RealisticBrick x={200} y={260} w={25} h={25} color="#C91A09" studs={4} />
-              {/* Body: 2x Yellow 2x4 stacked */}
+              {/* Legs: 2x Yellow 2x2 */}
+              <RealisticBrick x={180} y={260} w={20} h={20} color="#FFD500" studs={4} />
+              <RealisticBrick x={200} y={260} w={20} h={20} color="#FFD500" studs={4} />
+              {/* Body: 2x Yellow 2x4 */}
               <RealisticBrick x={160} y={215} w={80} h={40} color="#FFD500" studs={8} />
               <RealisticBrick x={170} y={190} w={60} h={30} color="#FFD500" studs={8} />
               {/* Head: 1x Yellow 2x2 */}
               <RealisticBrick x={170} y={160} w={30} h={30} color="#FFD500" studs={4} />
-              {/* Beak: 1x Red 1x4 (subset inventory has red 1x4) */}
-              <RealisticBrick x={200} y={170} w={30} h={10} color="#C91A09" studs={2} />
+              {/* Beak: 1x Red 1x4 Plate */}
+              <RealisticBrick x={200} y={170} w={30} h={10} color="#C91A09" studs={4} />
               {/* Tail: 1x White 2x2 */}
               <RealisticBrick x={235} y={195} w={20} h={20} color="#FFFFFF" studs={4} />
             </g>
 
-            {/* Build 2: Robot (Stronger structure) */}
+            {/* Build 2: Robot (Redesigned for clarity) */}
             <g className="animate-[figure-robot_18s_infinite] opacity-0">
               {/* Feet: 2x Blue 2x2 */}
-              <RealisticBrick x={175} y={280} w={25} h={25} color="#0055BF" studs={4} />
-              <RealisticBrick x={205} y={280} w={25} h={25} color="#0055BF" studs={4} />
+              <RealisticBrick x={180} y={285} w={20} h={20} color="#0055BF" studs={4} />
+              <RealisticBrick x={200} y={285} w={20} h={20} color="#0055BF" studs={4} />
               {/* Legs: 2x Blue 2x4 (standing up) */}
-              <RealisticBrick x={175} y={245} w={25} h={40} color="#0055BF" studs={4} />
-              <RealisticBrick x={205} y={245} w={25} h={40} color="#0055BF" studs={4} />
-              {/* Body: 1x Blue 2x4 */}
-              <RealisticBrick x={165} y={205} w={75} h={40} color="#0055BF" studs={8} />
+              <RealisticBrick x={180} y={245} w={20} h={40} color="#0055BF" studs={4} />
+              <RealisticBrick x={200} y={245} w={20} h={40} color="#0055BF" studs={4} />
+              {/* Torso: 1x Blue 2x4 (horizontal) */}
+              <RealisticBrick x={165} y={215} w={70} h={30} color="#0055BF" studs={8} />
+              {/* Arms: 2x Blue 2x2 (Attached to sides) */}
+              <RealisticBrick x={145} y={220} w={20} h={20} color="#0055BF" studs={4} />
+              <RealisticBrick x={235} y={220} w={20} h={20} color="#0055BF" studs={4} />
               {/* Head: 1x White 2x2 */}
-              <RealisticBrick x={188} y={175} w={30} h={30} color="#FFFFFF" studs={4} />
-              {/* Arms: 2x White 1x4 */}
-              <RealisticBrick x={135} y={210} w={30} h={10} color="#FFFFFF" studs={4} rotate={45} />
-              <RealisticBrick x={240} y={210} w={30} h={10} color="#FFFFFF" studs={4} rotate={-45} />
+              <RealisticBrick x={190} y={185} w={20} h={25} color="#FFFFFF" studs={4} />
+              {/* Antenna: 1x Red 2x4 for base detail */}
+              <RealisticBrick x={185} y={210} w={30} h={10} color="#C91A09" studs={4} />
             </g>
 
-            {/* Build 3: Rocket (Multi-stage) */}
+            {/* Build 3: Race Car */}
             <g className="animate-[figure-car_18s_infinite] opacity-0">
-              {/* Base Fins: 2x Yellow 2x2 */}
-              <RealisticBrick x={145} y={280} w={30} h={30} color="#FFD500" studs={4} rotate={-30} />
-              <RealisticBrick x={225} y={280} w={30} h={30} color="#FFD500" studs={4} rotate={30} />
-              {/* Stage 1: Yellow 2x4 */}
-              <RealisticBrick x={160} y={270} w={80} h={40} color="#FFD500" studs={8} />
-              {/* Stage 2: Red 2x4 */}
-              <RealisticBrick x={160} y={230} w={80} h={40} color="#C91A09" studs={8} />
-              {/* Stage 3: Blue 2x4 */}
-              <RealisticBrick x={160} y={190} w={80} h={40} color="#0055BF" studs={8} />
-              {/* Capsule: White 2x2 */}
-              <RealisticBrick x={185} y={160} w={30} h={30} color="#FFFFFF" studs={4} />
-              {/* Tip: Red 2x2 (subset has red 2x2) */}
-              <RealisticBrick x={185} y={140} w={30} h={20} color="#C91A09" studs={4} />
+              {/* Wheels: 4x Red 2x2 */}
+              <RealisticBrick x={145} y={275} w={25} h={25} color="#C91A09" studs={4} />
+              <RealisticBrick x={235} y={275} w={25} h={25} color="#C91A09" studs={4} />
+              
+              {/* Chassis: Blue 2x4 */}
+              <RealisticBrick x={140} y={250} w={120} h={35} color="#0055BF" studs={8} />
+              
+              {/* Body/Cockpit Area: Yellow 2x4 */}
+              <RealisticBrick x={165} y={220} w={70} h={35} color="#FFD500" studs={8} />
+              
+              {/* Windshield/Driver: White 2x2 */}
+              <RealisticBrick x={185} y={195} w={30} h={30} color="#FFFFFF" studs={4} />
+              
+              {/* Engine Cover: Red 2x2 */}
+              <RealisticBrick x={215} y={225} w={30} h={20} color="#C91A09" studs={4} />
+
+              {/* Rear Spoiler: Yellow 2x4 on supports */}
+              <RealisticBrick x={135} y={225} w={15} h={25} color="#FFD500" studs={2} />
+              <RealisticBrick x={130} y={205} w={50} h={20} color="#C91A09" studs={4} rotate={-5} />
             </g>
           </svg>
         </div>
