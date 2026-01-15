@@ -1,15 +1,26 @@
 
 import React, { useState } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import BrickButton from './components/BrickButton';
 import VisionModal from './components/VisionModal';
 import ResultsView from './components/ResultsView';
 import JourneyAnimation from './components/JourneyAnimation';
+import DiscoverView from './components/DiscoverView';
 import { analyzeBrickPile } from './services/geminiService';
 import { VisionAnalysis } from './types';
 
-type ViewState = 'landing' | 'results';
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
-const App: React.FC = () => {
+type ViewState = 'landing' | 'results' | 'discover';
+
+const AppContent: React.FC = () => {
   const [view, setView] = useState<ViewState>('landing');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,20 +54,45 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const navigateToDiscover = () => {
+    setView('discover');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen flex flex-col font-body bg-white">
       <nav className="bg-white border-b-8 border-legoRed px-8 py-6 sticky top-0 z-40 shadow-xl flex justify-between items-center">
-        <div className="flex items-center gap-4 cursor-pointer" onClick={handleReset}>
-          <div className="w-12 h-12 bg-legoRed rounded-xl shadow-lego flex items-center justify-center">
-            <div className="grid grid-cols-2 gap-1.5">
-              {[1, 2, 3, 4].map(i => <div key={i} className="w-2.5 h-2.5 bg-white/40 rounded-full"></div>)}
+        <div className="flex items-center gap-8">
+          <div className="flex items-center gap-4 cursor-pointer group" onClick={handleReset}>
+            <div className="w-12 h-12 bg-legoRed rounded-xl shadow-lego flex items-center justify-center group-hover:rotate-6 transition-transform">
+              <div className="grid grid-cols-2 gap-1.5">
+                {[1, 2, 3, 4].map(i => <div key={i} className="w-2.5 h-2.5 bg-white/40 rounded-full"></div>)}
+              </div>
             </div>
+            <h1 className="font-heading text-3xl text-legoBlue">LegoVision</h1>
           </div>
-          <h1 className="font-heading text-3xl text-legoBlue">LegoVision</h1>
+          
+          <div className="hidden md:flex items-center gap-6">
+            <button 
+              onClick={handleReset}
+              className={`font-heading text-lg transition-colors ${view === 'landing' ? 'text-legoRed' : 'text-legoBlue hover:text-legoRed'}`}
+            >
+              Scanner
+            </button>
+            <button 
+              onClick={navigateToDiscover}
+              className={`font-heading text-lg transition-colors ${view === 'discover' ? 'text-legoRed' : 'text-legoBlue hover:text-legoRed'}`}
+            >
+              Discover
+            </button>
+          </div>
         </div>
-        <BrickButton variant="blue" className="!text-sm !px-6" onClick={() => setIsModalOpen(true)}>
-          {view === 'results' ? 'Rescan' : 'Analyze Now'}
-        </BrickButton>
+
+        <div className="flex items-center gap-4">
+          <BrickButton variant="blue" className="!text-sm !px-6 hidden sm:flex" onClick={() => setIsModalOpen(true)}>
+            {view === 'results' ? 'Rescan' : 'Snap Photo'}
+          </BrickButton>
+        </div>
       </nav>
 
       {isLoading ? (
@@ -71,8 +107,8 @@ const App: React.FC = () => {
           </div>
         </div>
       ) : (
-        view === 'landing' ? (
-          <>
+        <>
+          {view === 'landing' && (
             <section className="max-w-7xl mx-auto px-6 py-16 grid lg:grid-cols-2 gap-16 items-center">
               <div className="space-y-10 text-center lg:text-left">
                 <div className="inline-block bg-legoRed text-white px-6 py-2 rounded-xl font-heading text-sm tracking-widest uppercase">AI-Powered Builder</div>
@@ -81,12 +117,29 @@ const App: React.FC = () => {
                   <span className="text-legoRed">bricks.</span>
                 </h2>
                 <p className="text-2xl text-gray-500 font-bold max-w-xl mx-auto lg:mx-0">Turn your loose pieces into creative micro-builds using advanced computer vision.</p>
-                <BrickButton onClick={() => setIsModalOpen(true)} className="!px-12 !py-6 !text-3xl !rounded-3xl shadow-lego">Snap a Photo ✨</BrickButton>
+                <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
+                  <BrickButton onClick={() => setIsModalOpen(true)} className="!px-12 !py-6 !text-3xl !rounded-3xl shadow-lego">Snap a Photo ✨</BrickButton>
+                  <BrickButton onClick={navigateToDiscover} variant="blue" className="!px-12 !py-6 !text-3xl !rounded-3xl shadow-lego-blue">Explore Sets 🚀</BrickButton>
+                </div>
               </div>
               <JourneyAnimation />
             </section>
+          )}
 
-            {/* Visual How It Works Section */}
+          {view === 'results' && analysisResult && (
+            <ResultsView 
+              result={analysisResult} 
+              sourceImage={sourceImage!} 
+              onReset={handleReset} 
+              onNewScan={() => setIsModalOpen(true)} 
+              onRegenerate={() => handleScanRequest(sourceImage!.split(',')[1], sourceImage!)}
+              isRegenerating={isLoading}
+            />
+          )}
+
+          {view === 'discover' && <DiscoverView />}
+
+          {view === 'landing' && (
             <section className="bg-legoGray py-24 px-6 border-y-[12px] border-legoYellow">
               <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-16">
@@ -118,28 +171,30 @@ const App: React.FC = () => {
                 </div>
               </div>
             </section>
-          </>
-        ) : (
-          <ResultsView 
-            result={analysisResult!} 
-            sourceImage={sourceImage!} 
-            onReset={handleReset} 
-            onNewScan={() => setIsModalOpen(true)} 
-            onRegenerate={() => handleScanRequest(sourceImage!.split(',')[1], sourceImage!)}
-            isRegenerating={isLoading}
-          />
-        )
+          )}
+        </>
       )}
 
       <VisionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onScan={handleScanRequest} />
       
-      {view === 'landing' && !isLoading && (
-        <footer className="bg-legoBlue text-white py-16 text-center">
-          <p className="font-black opacity-30 uppercase tracking-[0.4em] text-xs">LegoVision Lab // Powered by Gemini</p>
+      {!isLoading && (
+        <footer className="bg-legoBlue text-white py-16 text-center mt-auto">
+          <div className="flex justify-center gap-8 mb-8 font-heading text-sm uppercase tracking-widest">
+            <button onClick={handleReset} className="hover:text-legoYellow transition-colors">Scanner</button>
+            <button onClick={navigateToDiscover} className="hover:text-legoYellow transition-colors">Discover</button>
+            <a href="https://rebrickable.com/api/" target="_blank" rel="noreferrer" className="hover:text-legoYellow transition-colors">Data Partners</a>
+          </div>
+          <p className="font-black opacity-30 uppercase tracking-[0.4em] text-xs">LegoVision Lab // Powered by Gemini Intelligence</p>
         </footer>
       )}
     </div>
   );
 };
+
+const App: React.FC = () => (
+  <QueryClientProvider client={queryClient}>
+    <AppContent />
+  </QueryClientProvider>
+);
 
 export default App;

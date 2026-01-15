@@ -1,13 +1,6 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { VisionAnalysis } from "../types";
-
-/**
- * Strictly follows @google/genai guidelines:
- * - Always use new GoogleGenAI({ apiKey: process.env.API_KEY })
- * - Direct use of .text property for responses
- * - Correct model names
- */
+import { VisionAnalysis, DiscoverItem } from "../types";
 
 export async function analyzeBrickPile(base64Image: string): Promise<VisionAnalysis> {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -115,4 +108,88 @@ export async function generateBuildImage(
   }
   
   throw new Error("Image generation failed");
+}
+
+export async function getDiscoveryData(topic: string, query: string = "", page: number = 1): Promise<DiscoverItem[]> {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  
+  const searchQueryText = query ? ` specifically searching for "${query}"` : " trending and iconic entries";
+  const offsetText = page > 1 ? ` (Page ${page} - provide unique results)` : "";
+  
+  const prompt = `Act as an expert LEGO librarian utilizing high-fidelity data patterns from Brickset, Rebrickable, and BrickLink.
+  
+  Provide a structured catalog of 20 LEGO ${topic}${searchQueryText}.${offsetText}
+  
+  Required Metadata per item:
+  - Official IDs: Sets (Set Number), Parts (Part/Element ID), Minifigs (Minifig ID).
+  - Categorization: Theme and Subtheme (from Brickset patterns).
+  - Physicals: Piece count and Release Year.
+  - Marketplace Insight: Estimated secondary market value (BrickLink style) and a Rarity score (Common, Rare, Legendary).
+  - Descriptions: A historical summary of why this item is notable.
+  - Fun Facts: 2 technical or trivia-based facts.
+
+  Return results as a JSON array. Construct 'imageUrl' based on official CDNs if possible (e.g. Brickset images).`;
+
+  const response = await ai.models.generateContent({
+    model: "gemini-3-pro-preview",
+    contents: prompt,
+    config: {
+      tools: [{ googleSearch: {} }],
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.ARRAY,
+        items: {
+          type: Type.OBJECT,
+          properties: {
+            id: { type: Type.STRING },
+            title: { type: Type.STRING },
+            type: { type: Type.STRING },
+            year: { type: Type.STRING },
+            pieceCount: { type: Type.NUMBER },
+            description: { type: Type.STRING },
+            imageUrl: { type: Type.STRING },
+            funFacts: { type: Type.ARRAY, items: { type: Type.STRING } },
+            theme: { type: Type.STRING },
+            subtheme: { type: Type.STRING },
+            rarity: { type: Type.STRING },
+            marketPrice: { type: Type.STRING },
+            category: { type: Type.STRING }
+          },
+          required: ["id", "title", "type", "description", "funFacts", "rarity"]
+        }
+      }
+    }
+  });
+
+  const rawJson = response.text || "[]";
+  const items: any[] = JSON.parse(rawJson);
+  
+  const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+  const sourceUrls = groundingChunks
+    .map((chunk: any) => chunk.web)
+    .filter((web: any) => web && web.uri)
+    .map((web: any) => ({ title: web.title, uri: web.uri }));
+
+  return items.map(item => {
+    let imageUrl = item.imageUrl;
+    const cleanId = String(item.id).replace(/-1$/, '').trim();
+    
+    if (!imageUrl || imageUrl.includes('placeholder') || imageUrl.length < 10) {
+      if (topic === 'sets') {
+        imageUrl = `https://images.brickset.com/sets/images/${cleanId}.jpg`;
+      } else if (topic === 'pieces') {
+        imageUrl = `https://img.bricklink.com/ItemImage/PN/0/${cleanId}.png`;
+      } else if (topic === 'minifigures') {
+        imageUrl = `https://img.bricklink.com/ItemImage/MN/0/${cleanId}.png`;
+      } else {
+        imageUrl = `https://placehold.co/600x400/0055BF/FFFFFF?text=${encodeURIComponent(item.title)}`;
+      }
+    }
+
+    return {
+      ...item,
+      imageUrl,
+      sourceUrls: sourceUrls.slice(0, 3)
+    };
+  });
 }
