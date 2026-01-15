@@ -25,15 +25,18 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
   - COLOR: Exact color (e.g., "Bright Red", "Dark Blue", "Yellow").
   - CATEGORY: Brick, Plate, Slope, Tile, or Special.
 
-  PHASE 2: SUGGESTIONS (STRICT CONSTRAINTS)
-  Suggest EXACTLY 3 creative "micro-build" ideas based ONLY on the inventory from Phase 1.
+  PHASE 2: SUGGESTIONS (STRICT ENHANCED COMPLEXITY CONSTRAINTS)
+  Suggest EXACTLY 3 creative and highly detailed builds based ONLY on the inventory from Phase 1. 
   
-  DIFFICULTY SCALING RULES:
-  You MUST provide a range of challenges. Generate exactly:
-  1. ONE 'Easy' build: Simple structure, few pieces, very stable.
-  2. ONE 'Medium' build: Moderate complexity, clever piece usage.
-  3. ONE 'Hard' build: Complex structure, advanced spatial reasoning, maximizing the available inventory for detail.
-  - If the inventory is very small, scale the complexity of these 3 levels relative to what is possible with the available pieces.
+  CRITICAL: You must aim for a complexity level at least 3x higher than a basic blocky representation. Do not suggest simple 5-10 piece models if the inventory allows for more.
+
+  DIFFICULTY SCALING RULES (ENHANCED):
+  You MUST provide a range of challenges that feel substantial and professional.
+  1. ONE 'Easy' build: A solid, recognizable structure. Uses a significant portion of simple bricks to create a substantial form with clear proportions. 
+  2. ONE 'Medium' build: High detail level. Incorporates layering (plates on bricks), texture, and clever piece usage to define features like eyes, wheels, or architectural details.
+  3. ONE 'Hard' build: Maximum complexity. An intricate, dense model that utilizes nearly the entire suitable inventory. Includes fine details, internal sub-assemblies, and sophisticated shaping.
+  
+  If the inventory is very small, maximize the density of the 3 levels relative to what is possible. 
 
   ZERO HALLUCINATION INVENTORY RULES:
   1. NO EXTRA PIECES: If the image contains 5 red 2x4 bricks, a suggestion CANNOT use 6 red 2x4 bricks.
@@ -48,12 +51,12 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
   3. LEGAL TECHNIQUES ONLY: No "illegal" stress-inducing connections.
 
   VISUAL ICON RULES:
-  - The 'icon' field MUST be a single representative emoji character only. Do not use text descriptions or labels in the icon field.
+  - The 'icon' field MUST be a single representative emoji character only.
 
   Return the result in valid JSON format matching the schema provided.`;
 
   const result = await ai.models.generateContent({
-    model: "gemini-3-pro-preview", // Upgrading to Pro for stricter logic adherence
+    model: "gemini-3-pro-preview",
     contents: {
       parts: [
         { inlineData: { data: base64Image, mimeType: "image/jpeg" } },
@@ -98,7 +101,7 @@ export async function analyzeBrickPile(base64Image: string): Promise<VisionAnaly
                 steps: {
                   type: Type.ARRAY,
                   items: { type: Type.STRING },
-                  description: "Step-by-step instructions using ONLY the requiredBricks for this build."
+                  description: "Detailed, step-by-step instructions (at least 5-10 steps) using ONLY the requiredBricks for this build."
                 }
               },
               required: ["title", "icon", "description", "difficulty", "estimatedPieces", "requiredBricks", "steps"]
@@ -127,7 +130,7 @@ export async function generateBuildImage(
 ): Promise<string> {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  const prompt = `Generate a stylized cartoon illustration of the completed LEGO micro-build called "${title}". 
+  const prompt = `Generate a stylized cartoon illustration of the completed complex LEGO micro-build called "${title}". 
   
   STRICT INVENTORY ADHERENCE:
   You MUST visualize ONLY these specific pieces: ${requiredBricks.join(', ')}. 
@@ -135,10 +138,10 @@ export async function generateBuildImage(
   - Match dimensions (stud count) exactly to the list.
   - Do NOT add any extra pieces that are not in the list.
 
-  PHYSICAL LOGIC:
+  PHYSICAL LOGIC & COMPLEXITY:
+  - This is a high-detail model with many pieces layered together.
   - Every connection must be via studs (stud-to-tube).
-  - The model must be structurally sound and physically buildable.
-  - NO side-to-side floating pieces.
+  - Show depth, layering, and intricate shaping.
 
   VISUAL STYLE:
   - 2.5D perspective, clean thick black outlines.
