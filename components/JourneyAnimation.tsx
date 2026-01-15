@@ -33,7 +33,7 @@ const JourneyAnimation: React.FC<JourneyAnimationProps> = ({ imageUrl, className
           )}
         </div>
 
-        {/* Centered Analyzing Badge */}
+        {/* Centered Analyzing Badge for active processing */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-3 font-mono text-[13px] md:text-[16px] text-legoBlue font-black tracking-[0.15em] uppercase z-50 bg-white/95 backdrop-blur-md px-6 py-4 rounded-[1.5rem] border-4 border-legoBlue shadow-[0_20px_40px_rgba(0,0,0,0.2)] scale-110 md:scale-125">
           <div className="w-4 h-4 bg-legoRed rounded-full animate-pulse shadow-[0_0_15px_rgba(201,26,9,0.8)]"></div>
           <span className="flex items-center whitespace-nowrap">
@@ -49,6 +49,14 @@ const JourneyAnimation: React.FC<JourneyAnimationProps> = ({ imageUrl, className
       <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-100 to-gray-200"></div>
       <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
       
+      {/* Status Indicator (Top-Left) */}
+      <div className="absolute top-8 left-8 flex items-center gap-2 font-mono text-[11px] text-legoBlue font-black tracking-widest uppercase z-50 bg-white/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-legoBlue/10">
+        <div className="w-2 h-2 bg-legoRed rounded-full animate-pulse shadow-[0_0_8px_rgba(201,26,9,0.6)]"></div>
+        <span className="flex items-center">
+          Analyzing<span className="animate-dots w-4 text-left"></span>
+        </span>
+      </div>
+
       {/* Precision Scanning Beam */}
       <div className="absolute inset-y-0 w-[4px] bg-white z-50 animate-[scanner-beam_6s_infinite] shadow-[0_0_20px_white,0_0_10px_rgba(0,85,191,0.6)]"></div>
 
