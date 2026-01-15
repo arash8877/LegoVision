@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import BrickButton from './components/BrickButton';
 import VisionModal from './components/VisionModal';
@@ -59,10 +60,15 @@ const App: React.FC = () => {
       </nav>
 
       {isLoading ? (
-        <div className="flex-1 flex flex-col items-center justify-center p-12 bg-white">
-          <div className="w-32 h-32 bg-legoYellow rounded-[2rem] border-8 border-legoBlue shadow-lego animate-bounce flex items-center justify-center text-6xl">🧩</div>
-          <h2 className="mt-12 font-heading text-5xl text-legoBlue animate-pulse text-center">Precise Piece Inventory...</h2>
-          {error && <p className="mt-4 text-legoRed font-bold">{error}</p>}
+        <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 bg-white animate-in fade-in duration-500">
+          <div className="max-w-2xl w-full">
+            <JourneyAnimation imageUrl={sourceImage} isProcessing={true} className="mb-12" />
+            <div className="text-center">
+              <h2 className="font-heading text-4xl md:text-6xl text-legoBlue animate-pulse mb-4 uppercase tracking-tighter">Inventorying Pieces</h2>
+              <p className="text-xl text-gray-400 font-bold uppercase tracking-widest">Identifying every stud and brick...</p>
+              {error && <p className="mt-8 text-legoRed font-black bg-red-50 p-4 rounded-2xl border-2 border-legoRed">{error}</p>}
+            </div>
+          </div>
         </div>
       ) : (
         view === 'landing' ? (
@@ -89,28 +95,21 @@ const App: React.FC = () => {
                 </div>
 
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12">
-                  {/* Step 1 */}
                   <div className="bg-white p-8 rounded-[2.5rem] border-4 border-legoBlue shadow-lego-blue flex flex-col items-center text-center group">
                     <div className="w-20 h-20 bg-legoRed rounded-2xl shadow-lego flex items-center justify-center text-4xl mb-6 group-hover:rotate-12 transition-transform">🧱</div>
                     <h4 className="font-heading text-2xl text-legoBlue mb-2">1. Gather</h4>
                     <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Find your loose bricks</p>
                   </div>
-
-                  {/* Step 2 */}
                   <div className="bg-white p-8 rounded-[2.5rem] border-4 border-legoBlue shadow-lego-blue flex flex-col items-center text-center group">
                     <div className="w-20 h-20 bg-legoYellow rounded-2xl shadow-lego-yellow flex items-center justify-center text-4xl mb-6 group-hover:-rotate-12 transition-transform">📸</div>
                     <h4 className="font-heading text-2xl text-legoBlue mb-2">2. Snap</h4>
                     <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Take a clear photo</p>
                   </div>
-
-                  {/* Step 3 */}
                   <div className="bg-white p-8 rounded-[2.5rem] border-4 border-legoBlue shadow-lego-blue flex flex-col items-center text-center group">
                     <div className="w-20 h-20 bg-legoBlue rounded-2xl shadow-lego-blue flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition-transform">🔍</div>
                     <h4 className="font-heading text-2xl text-legoBlue mb-2">3. Analyze</h4>
                     <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">AI scans every piece</p>
                   </div>
-
-                  {/* Step 4 */}
                   <div className="bg-white p-8 rounded-[2.5rem] border-4 border-legoBlue shadow-lego-blue flex flex-col items-center text-center group">
                     <div className="w-20 h-20 bg-legoRed rounded-2xl shadow-lego flex items-center justify-center text-4xl mb-6 group-hover:rotate-6 transition-transform">🚀</div>
                     <h4 className="font-heading text-2xl text-legoBlue mb-2">4. Build</h4>

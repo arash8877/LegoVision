@@ -40,8 +40,17 @@
         background-image: radial-gradient(rgba(0,0,0,0.03) 20%, transparent 20%);
         background-size: 30px 30px;
       }
-      
-      /* PRECISION SCANNING ANIMATIONS */
+
+      /* SIMPLE MOTION INDICATOR ANIMATION */
+      @keyframes bob {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-30px); }
+      }
+      .animate-bob {
+        animation: bob 2s ease-in-out infinite;
+      }
+
+      /* PRECISION SCANNING ANIMATIONS (Kept for landing but bob is used for processing) */
       @keyframes scanner-beam {
         0%, 10% { left: 0%; opacity: 0; }
         15% { opacity: 1; }
@@ -49,20 +58,17 @@
         90%, 100% { left: 100%; opacity: 0; }
       }
 
-      /* Reveal structure on the LEFT of the beam as it moves right */
       @keyframes reveal-build {
         0%, 10% { clip-path: inset(0 100% 0 0); opacity: 0; }
         11% { opacity: 1; }
         90%, 100% { clip-path: inset(0 0 0 0); opacity: 1; }
       }
 
-      /* Hide pile on the LEFT of the beam (leaving only right side visible ahead of line) */
       @keyframes hide-pile {
         0%, 10% { clip-path: inset(0 0 0 0); opacity: 1; }
         90%, 100% { clip-path: inset(0 0 0 100%); opacity: 0; }
       }
 
-      /* Figure Cycle for the animation */
       @keyframes figure-duck {
         0%, 33.32% { opacity: 1; transform: scale(1); }
         33.33%, 100% { opacity: 0; transform: scale(0.95); }
