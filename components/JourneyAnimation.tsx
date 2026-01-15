@@ -33,10 +33,11 @@ const JourneyAnimation: React.FC<JourneyAnimationProps> = ({ imageUrl, className
           )}
         </div>
 
-        <div className="absolute top-8 left-8 flex items-center gap-2 font-mono text-[11px] text-legoBlue font-black tracking-widest uppercase z-50 bg-white/80 px-3 py-1 rounded-full border border-legoBlue/20">
-          <div className="w-2.5 h-2.5 bg-legoRed rounded-full animate-pulse"></div>
-          <span className="flex items-center">
-            Analyzing<span className="animate-dots w-4 text-left"></span>
+        {/* Centered Analyzing Badge */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-3 font-mono text-[13px] md:text-[16px] text-legoBlue font-black tracking-[0.15em] uppercase z-50 bg-white/95 backdrop-blur-md px-6 py-4 rounded-[1.5rem] border-4 border-legoBlue shadow-[0_20px_40px_rgba(0,0,0,0.2)] scale-110 md:scale-125">
+          <div className="w-4 h-4 bg-legoRed rounded-full animate-pulse shadow-[0_0_15px_rgba(201,26,9,0.8)]"></div>
+          <span className="flex items-center whitespace-nowrap">
+            Analyzing<span className="animate-dots w-6 text-left"></span>
           </span>
         </div>
       </div>
