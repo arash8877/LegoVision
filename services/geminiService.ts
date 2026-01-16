@@ -2,6 +2,9 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { VisionAnalysis, DiscoverItem } from "../types";
 
+// Local session cache for discovery results to bypass AI calls for identical recent queries
+const discoveryCache = new Map<string, DiscoverItem[]>();
+
 export async function analyzeBrickPile(base64Image: string): Promise<VisionAnalysis> {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
@@ -110,28 +113,29 @@ export async function generateBuildImage(
   throw new Error("Image generation failed");
 }
 
+/**
+ * Optimized Discovery Service
+ * Uses Gemini-3-Flash for lower latency and better responsiveness.
+ */
 export async function getDiscoveryData(topic: string, query: string = "", page: number = 1): Promise<DiscoverItem[]> {
+  const cacheKey = `${topic}-${query}-${page}`;
+  if (discoveryCache.has(cacheKey)) {
+    return discoveryCache.get(cacheKey)!;
+  }
+
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const searchQueryText = query ? ` specifically searching for "${query}"` : " trending and iconic entries";
-  const offsetText = page > 1 ? ` (Page ${page} - provide unique results)` : "";
+  const offsetText = page > 1 ? ` (Batch ${page})` : "";
   
-  const prompt = `Act as an expert LEGO librarian utilizing high-fidelity data patterns from Brickset, Rebrickable, and BrickLink.
-  
-  Provide a structured catalog of 20 LEGO ${topic}${searchQueryText}.${offsetText}
-  
-  Required Metadata per item:
-  - Official IDs: Sets (Set Number), Parts (Part/Element ID), Minifigs (Minifig ID).
-  - Categorization: Theme and Subtheme (from Brickset patterns).
-  - Physicals: Piece count and Release Year.
-  - Marketplace Insight: Estimated secondary market value (BrickLink style) and a Rarity score (Common, Rare, Legendary).
-  - Descriptions: A historical summary of why this item is notable.
-  - Fun Facts: 2 technical or trivia-based facts.
-
-  Return results as a JSON array. Construct 'imageUrl' based on official CDNs if possible (e.g. Brickset images).`;
+  // Refined prompt for speed - less conversational, more directive
+  const prompt = `JSON ONLY. 15 items. Topic: LEGO ${topic}${searchQueryText}.${offsetText}. 
+  Reference: Rebrickable, Brickset, BrickLink. 
+  Each item must have: id, title, type, year, pieceCount, description, funFacts (2), theme, rarity, marketPrice.
+  Output image URLs matching official CDN patterns if possible.`;
 
   const response = await ai.models.generateContent({
-    model: "gemini-3-pro-preview",
+    model: "gemini-3-flash-preview", // Switched to Flash for significantly faster response times
     contents: prompt,
     config: {
       tools: [{ googleSearch: {} }],
@@ -170,7 +174,7 @@ export async function getDiscoveryData(topic: string, query: string = "", page: 
     .filter((web: any) => web && web.uri)
     .map((web: any) => ({ title: web.title, uri: web.uri }));
 
-  return items.map(item => {
+  const processed = items.map(item => {
     let imageUrl = item.imageUrl;
     const cleanId = String(item.id).replace(/-1$/, '').trim();
     
@@ -192,4 +196,7 @@ export async function getDiscoveryData(topic: string, query: string = "", page: 
       sourceUrls: sourceUrls.slice(0, 3)
     };
   });
+
+  discoveryCache.set(cacheKey, processed);
+  return processed;
 }

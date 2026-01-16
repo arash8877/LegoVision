@@ -12,8 +12,9 @@ import { VisionAnalysis } from './types';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: 1000 * 60 * 15, // Increased to 15 minutes for better performance
       refetchOnWindowFocus: false,
+      gcTime: 1000 * 60 * 60, // Keep in garbage collection for an hour
     },
   },
 });

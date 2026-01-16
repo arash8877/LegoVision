@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { DiscoverItem } from '../types';
 import { getDiscoveryData } from '../services/geminiService';
 import BrickButton from './BrickButton';
@@ -9,12 +9,13 @@ const DiscoverView: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'sets' | 'pieces' | 'minifigures' | 'themes'>('sets');
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [selectedItem, setSelectedItem] = useState<DiscoverItem | null>(null);
+  const queryClient = useQueryClient();
 
+  // Optimized debounce for search input
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchQuery);
-    }, 600);
+    }, 400); // Reduced delay for snappier feel
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
@@ -26,25 +27,37 @@ const DiscoverView: React.FC = () => {
     isLoading,
     isError,
     error,
-    refetch
+    refetch,
+    isPlaceholderData
   } = useInfiniteQuery({
     queryKey: ['discovery', activeTab, debouncedSearch],
     queryFn: ({ pageParam = 1 }) => getDiscoveryData(activeTab, debouncedSearch, pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
-      return lastPage.length > 0 ? allPages.length + 1 : undefined;
+      return lastPage.length >= 10 ? allPages.length + 1 : undefined;
     },
+    placeholderData: (previousData) => previousData, // Maintain UI stability while loading
+    staleTime: 1000 * 60 * 10, // Cache for 10 minutes
   });
 
   const allItems = data?.pages.flat() || [];
 
+  // Prefetching logic to reduce perceived load time on tab switch
+  const handleTabPrefetch = useCallback((tab: string) => {
+    queryClient.prefetchInfiniteQuery({
+      queryKey: ['discovery', tab, ''],
+      queryFn: ({ pageParam = 1 }) => getDiscoveryData(tab, '', pageParam),
+      initialPageParam: 1,
+    });
+  }, [queryClient]);
+
   return (
-    <div className="min-h-screen bg-legoGray animate-in fade-in duration-500 pb-32">
+    <div className="min-h-screen bg-legoGray animate-in fade-in duration-300 pb-32">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="text-center mb-12">
           <h2 className="font-heading text-5xl md:text-7xl text-legoBlue mb-4 uppercase tracking-tighter">LEGO Archive</h2>
           <p className="text-xl text-gray-500 font-bold max-w-3xl mx-auto">
-            Deep dive into the world's largest brick collection. Powered by Rebrickable, Brickset, and BrickLink data patterns.
+            Deep dive into the world's largest brick collection. Optimized for speed and instant browsing.
           </p>
         </div>
 
@@ -53,18 +66,18 @@ const DiscoverView: React.FC = () => {
           <div className="w-full max-w-4xl relative group">
             <input 
               type="text"
-              placeholder={`Search ${activeTab}... (e.g. UCS Millennium Falcon, 2x4 Brick, Classic Space)`}
+              placeholder={`Quick search ${activeTab}...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-12 py-7 rounded-[2.5rem] border-4 border-legoBlue shadow-lego-blue outline-none font-bold text-2xl placeholder:text-gray-300 focus:ring-8 ring-legoYellow/20 transition-all pr-20"
             />
             <div className="absolute right-10 top-1/2 -translate-y-1/2 flex items-center gap-4">
-              {isLoading || isFetchingNextPage ? (
+              {(isLoading || isFetchingNextPage) ? (
                 <div className="w-10 h-10 border-4 border-legoYellow border-t-legoRed rounded-full animate-spin"></div>
               ) : searchQuery ? (
                 <button onClick={() => setSearchQuery('')} className="text-3xl text-gray-300 hover:text-legoRed transition-colors">✕</button>
               ) : (
-                <span className="text-4xl grayscale group-focus-within:grayscale-0 transition-all">🔎</span>
+                <span className="text-4xl opacity-20 grayscale group-focus-within:grayscale-0 group-focus-within:opacity-100 transition-all">🔎</span>
               )}
             </div>
           </div>
@@ -79,6 +92,7 @@ const DiscoverView: React.FC = () => {
               <BrickButton 
                 key={tab.id}
                 variant={activeTab === tab.id ? 'red' : 'blue'} 
+                onMouseEnter={() => handleTabPrefetch(tab.id)} // Intent-based prefetching
                 onClick={() => { setActiveTab(tab.id as any); setSearchQuery(''); }}
                 className={`!px-12 !py-5 !text-2xl transition-all ${activeTab === tab.id ? 'scale-110 shadow-lego ring-8 ring-legoYellow/10' : 'opacity-60 hover:opacity-100 shadow-none'}`}
               >
@@ -88,23 +102,23 @@ const DiscoverView: React.FC = () => {
           </div>
         </div>
 
-        {isLoading ? (
+        {isLoading && !allItems.length ? (
           <div className="flex flex-col items-center justify-center py-40">
             <div className="relative mb-12">
               <div className="w-40 h-40 border-[16px] border-legoYellow border-t-legoRed rounded-full animate-spin"></div>
-              <div className="absolute inset-0 flex items-center justify-center text-6xl">📦</div>
+              <div className="absolute inset-0 flex items-center justify-center text-6xl animate-bounce">📦</div>
             </div>
-            <h3 className="font-heading text-4xl text-legoBlue animate-pulse uppercase tracking-widest">Indexing Bricks</h3>
-            <p className="text-gray-400 font-bold mt-4">Simulating API handshake with global catalogs...</p>
+            <h3 className="font-heading text-4xl text-legoBlue animate-pulse uppercase tracking-widest">Searching Archive</h3>
+            <p className="text-gray-400 font-bold mt-4">Connecting to lightning-fast LEGO mirrors...</p>
           </div>
         ) : isError ? (
           <div className="bg-white p-16 rounded-[4rem] text-center border-8 border-legoRed shadow-2xl max-w-2xl mx-auto">
             <h3 className="font-heading text-4xl text-legoRed mb-6">Database Offline</h3>
-            <p className="text-xl text-gray-500 font-bold mb-10">Check your API connection or key permissions.</p>
+            <p className="text-xl text-gray-500 font-bold mb-10">We encountered a temporary bottleneck. Try again.</p>
             <BrickButton variant="red" onClick={() => refetch()}>Retry Handshake</BrickButton>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
+          <div className={`grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 transition-opacity duration-300 ${isPlaceholderData ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
             {allItems.map((item, idx) => (
               <ItemCard key={`${item.id}-${idx}`} item={item} />
             ))}
@@ -136,12 +150,13 @@ const ItemCard: React.FC<{ item: DiscoverItem }> = ({ item }) => {
   };
 
   return (
-    <div className="bg-white rounded-[3rem] border-4 border-legoBlue shadow-xl overflow-hidden flex flex-col group hover:-translate-y-4 hover:shadow-2xl transition-all duration-500">
+    <div className="bg-white rounded-[3rem] border-4 border-legoBlue shadow-xl overflow-hidden flex flex-col group hover:-translate-y-4 hover:shadow-2xl transition-all duration-500 animate-in slide-in-from-bottom-4">
       <div className="aspect-square bg-white relative overflow-hidden flex items-center justify-center p-8">
         <div className="absolute inset-0 stud-pattern-light opacity-5"></div>
         <img 
           src={item.imageUrl} 
           alt={item.title} 
+          loading="lazy"
           className="relative z-10 w-full h-full object-contain group-hover:scale-110 transition-transform duration-700"
           onError={(e) => { (e.target as HTMLImageElement).src = `https://placehold.co/600x400/FFD500/0055BF?text=${encodeURIComponent(item.title)}`; }}
         />
@@ -173,11 +188,11 @@ const ItemCard: React.FC<{ item: DiscoverItem }> = ({ item }) => {
         
         <div className="grid grid-cols-2 gap-4 mb-8">
           <div className="bg-legoGray/50 p-4 rounded-2xl border border-legoBlue/5">
-            <p className="text-[9px] font-black text-gray-400 uppercase tracking-tighter mb-1">Market Value</p>
-            <p className="text-lg font-heading text-legoBlue">{item.marketPrice || 'N/A'}</p>
+            <p className="text-[9px] font-black text-gray-400 uppercase tracking-tighter mb-1">Value</p>
+            <p className="text-lg font-heading text-legoBlue truncate">{item.marketPrice || 'N/A'}</p>
           </div>
           <div className="bg-legoGray/50 p-4 rounded-2xl border border-legoBlue/5">
-            <p className="text-[9px] font-black text-gray-400 uppercase tracking-tighter mb-1">Complexity</p>
+            <p className="text-[9px] font-black text-gray-400 uppercase tracking-tighter mb-1">Bricks</p>
             <p className="text-lg font-heading text-legoRed">{item.pieceCount || '0'}P</p>
           </div>
         </div>
